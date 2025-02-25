@@ -44,7 +44,23 @@
 			<artifactId>curator-recipes</artifactId>
 			<version>2.13.0</version>
 		</dependency>
-
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-core</artifactId>
+			<version>2.2.15</version>
+		</dependency>
+		<!-- Swagger Annotations -->
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>2.2.15</version>
+		</dependency>
+		<!-- Springdoc OpenAPI for Spring Boot Web MVC -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.2.0</version>
+		</dependency>
 		<dependency>
 			<groupId>com.dameng</groupId>
 			<artifactId>DmJdbcDriver18</artifactId>

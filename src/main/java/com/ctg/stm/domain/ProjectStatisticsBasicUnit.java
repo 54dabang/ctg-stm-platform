@@ -17,6 +17,10 @@ public class ProjectStatisticsBasicUnit implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ApiModelProperty(value = "项目名称")
+    @Column(name = "project_name")
+    private String ProjectName;
+
     @ApiModelProperty(value = "主管单位 责任单位")
     @Column(name = "principal_unit")
     private String principalUnit;
