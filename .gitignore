@@ -1,0 +1,17 @@
+target
+.classpath
+.project
+.settings
+
+.idea/
+*.iml
+
+logs/
+
+*/node_modules
+scripts/*.csv
+scripts/*.txt
+*.tmp
+*.swp
+
+.DS_Store
