@@ -2,6 +2,9 @@ package com.ctg.stm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -11,6 +14,9 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "MA_PROJECT_STATISTICS_BASIC_UNIT")
+@NoArgsConstructor
+@Getter
+@Setter
 public class ProjectStatisticsBasicUnit implements Serializable {
     @Id
     @Column(name = "id")
@@ -19,7 +25,7 @@ public class ProjectStatisticsBasicUnit implements Serializable {
 
     @ApiModelProperty(value = "项目名称")
     @Column(name = "project_name")
-    private String ProjectName;
+    private String projectName;
 
     @ApiModelProperty(value = "主管单位 责任单位")
     @Column(name = "principal_unit")
@@ -51,7 +57,7 @@ public class ProjectStatisticsBasicUnit implements Serializable {
     private String projectType;
 
     @ApiModelProperty(value = "项目阶段，立项中、执行中、验收")
-    @Column(name = "项目阶段")
+    @Column(name = "bpm_status")
     private String bpmStatus;
 
 
