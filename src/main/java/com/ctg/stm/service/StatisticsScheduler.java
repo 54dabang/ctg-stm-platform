@@ -13,7 +13,7 @@ public class StatisticsScheduler {
     private EntityManager entityManager;
 
     public List<Map<String, Object>> selectDepart() {
-        String querySql = "SELECT ID, DEPART_NAME FROM SYS_DEPART";
+        String querySql = "SELECT ID, PROJECT_NAME,  FROM MA_PRJ_I_S_PROJECT_TD";
         List<Map<String, Object>> resultList = entityManager.createNativeQuery(querySql)
                 .getResultList();
         return resultList;

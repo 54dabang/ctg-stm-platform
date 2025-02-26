@@ -117,5 +117,10 @@ public class Statistics implements Serializable {
     @Column(name = "PROJECT_IMPORTANT")
     private int projectImportant;
 
+    @ApiModelProperty(value = "流程状态")
+    @Column(name = "BPM_STATUS")
+    private int bpmStatus;
+
+
 
 }
