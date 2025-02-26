@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.ctg.stm.util.Constants;
+import com.ctg.stm.util.Result;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -23,13 +24,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.ws.Response;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
@@ -107,7 +102,8 @@ public class ApiAspect {
             long cost = System.currentTimeMillis() - startTime;
             logArguments.put(Constants.LOG_KEY_RESULT,"fail");
             logger.error(appendEntries(logArguments),"http异常:[{}.{}][cost={}ms]", clazzName, methodName,cost,e);
-            return Constants.getResponseStr(Constants.CODE_ERROR,e.getMessage());
+            //return Constants.getResponseStr(Constants.CODE_ERROR,e.getMessage());
+            return Result.error(e.getMessage(),null);
         }
     }
 
