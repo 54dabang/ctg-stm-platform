@@ -1,0 +1,121 @@
+package com.ctg.stm.domain;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "STATISTICS")
+public class Statistics implements Serializable {
+    @Id
+    @Column(name = "ID")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ApiModelProperty(value = "项目名")
+    @Column(name = "PROJECT_NAME")
+    private String projectName;
+
+    @ApiModelProperty(value = "项目开始时间")
+    @Column(name = "START_TIME")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startTime;
+
+    @ApiModelProperty(value = "项目结束时间")
+    @Column(name = "END_TIME")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endTime;
+
+    @ApiModelProperty(value = "责任单位")
+    @Column(name = "PRINCIPAL_UNIT")
+    private String principalUnit;
+
+    @ApiModelProperty(value = "负责人")
+    @Column(name = "PRINCIPAL_NAME")
+    private String principalName;
+
+    @ApiModelProperty(value = "项目层级（国家级、省部级、集团级、子企业级）")
+    @Column(name = "PROJECT_CATEGORY")
+    private String projectCategory;
+
+    @ApiModelProperty(value = "项目类别（自主、外联）")
+    @Column(name = "PROJECT_TYPE")
+    private String projectType;
+
+    @ApiModelProperty(value = "研发属性（基础研究、应用基础研究、应用研究、技术与产品开发（试验发展、软科学研究）、其它")
+    @Column(name = "RESEARCH_ATTRIBUTE")
+    private String researchAttribute;
+
+    @ApiModelProperty(value = "项目金额")
+    @Column(name = "TOTAL_FUNDS")
+    private BigDecimal totalFunds;
+
+    @ApiModelProperty(value = "项目级别，依据totalFunds划分为大型、中型、小型")
+    @Column(name = "PROJECT_LEVEL")
+    private String projectLevel;
+
+    @ApiModelProperty(value = "项目成果数量（累计）")
+    @Column(name = "PROJECT_RESULT")
+    private int projectResult;
+
+//    @ApiModelProperty(value = "项目成果（近1月）")
+//    @Column(name = "PROJECT_RESULT_1")
+//    private int projectResult1;
+//
+//    @ApiModelProperty(value = "项目成果（近3月）")
+//    @Column(name = "PROJECT_RESULT_3")
+//    private int projectResult3;
+//
+//    @ApiModelProperty(value = "项目成果（近12月）")
+//    @Column(name = "PROJECT_RESULT_12")
+//    private int projectResult12;
+
+    @ApiModelProperty(value = "研发投入金额（累计）")
+    @Column(name = "PROJECT_FUNDS")
+    private BigDecimal projectfunds;
+
+//    @ApiModelProperty(value = "研发投入（近1月）")
+//    @Column(name = "PROJECT_FUNDS_1")
+//    private BigDecimal projectfunds1;
+//
+//    @ApiModelProperty(value = "研发投入（近3月）")
+//    @Column(name = "PROJECT_FUNDS_3")
+//    private BigDecimal projectfunds3;
+//
+//    @ApiModelProperty(value = "研发投入（近12月）")
+//    @Column(name = "PROJECT_FUNDS_12")
+//    private BigDecimal projectfunds12;
+
+    @ApiModelProperty(value = "项目执行（立项中、执行中、验收阶段）")
+    @Column(name = "PROJECT_STATUS")
+    private String projectStatus;
+
+//    @ApiModelProperty(value = "近1月项目执行情况（1立项中、2执行中、3验收中）")
+//    @Column(name = "PROJECT_STATUS_1")
+//    private int projectStatus1;
+//
+//    @ApiModelProperty(value = "近3月项目执行情况（1立项中、2执行中、3验收中）")
+//    @Column(name = "PROJECT_STATUS_3")
+//    private int projectStatus3;
+
+
+    @ApiModelProperty(value = "验收节点（待获取节点信息）")
+    @Column(name = "ACCEPTANCE_POINT")
+    private int acceptancePoint;
+
+    @ApiModelProperty(value = "是否重点项目")
+    @Column(name = "PROJECT_IMPORTANT")
+    private int projectImportant;
+
+
+}
