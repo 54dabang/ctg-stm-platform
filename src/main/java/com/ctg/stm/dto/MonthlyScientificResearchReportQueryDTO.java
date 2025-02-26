@@ -25,7 +25,7 @@ public class MonthlyScientificResearchReportQueryDTO {
     private String businessSector;
 
     @ApiModelProperty(value = "研发属性 基础研究 应用基础研究")
-    private String researchAttributes;
+    private String researchAttribute;
 
 
     @ApiModelProperty(value = "项目层级 项目类别 国家级")

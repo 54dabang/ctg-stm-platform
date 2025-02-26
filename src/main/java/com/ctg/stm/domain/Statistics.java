@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+
 @Entity
 @Table(name = "STATISTICS")
 public class Statistics implements Serializable {
@@ -68,45 +69,18 @@ public class Statistics implements Serializable {
     @Column(name = "PROJECT_RESULT")
     private int projectResult;
 
-//    @ApiModelProperty(value = "项目成果（近1月）")
-//    @Column(name = "PROJECT_RESULT_1")
-//    private int projectResult1;
-//
-//    @ApiModelProperty(value = "项目成果（近3月）")
-//    @Column(name = "PROJECT_RESULT_3")
-//    private int projectResult3;
-//
-//    @ApiModelProperty(value = "项目成果（近12月）")
-//    @Column(name = "PROJECT_RESULT_12")
-//    private int projectResult12;
+
 
     @ApiModelProperty(value = "研发投入金额（累计）")
     @Column(name = "PROJECT_FUNDS")
     private BigDecimal projectfunds;
 
-//    @ApiModelProperty(value = "研发投入（近1月）")
-//    @Column(name = "PROJECT_FUNDS_1")
-//    private BigDecimal projectfunds1;
-//
-//    @ApiModelProperty(value = "研发投入（近3月）")
-//    @Column(name = "PROJECT_FUNDS_3")
-//    private BigDecimal projectfunds3;
-//
-//    @ApiModelProperty(value = "研发投入（近12月）")
-//    @Column(name = "PROJECT_FUNDS_12")
-//    private BigDecimal projectfunds12;
+
 
     @ApiModelProperty(value = "项目执行（立项中、执行中、验收阶段）")
     @Column(name = "PROJECT_STATUS")
     private String projectStatus;
 
-//    @ApiModelProperty(value = "近1月项目执行情况（1立项中、2执行中、3验收中）")
-//    @Column(name = "PROJECT_STATUS_1")
-//    private int projectStatus1;
-//
-//    @ApiModelProperty(value = "近3月项目执行情况（1立项中、2执行中、3验收中）")
-//    @Column(name = "PROJECT_STATUS_3")
-//    private int projectStatus3;
 
 
     @ApiModelProperty(value = "验收节点（待获取节点信息）")

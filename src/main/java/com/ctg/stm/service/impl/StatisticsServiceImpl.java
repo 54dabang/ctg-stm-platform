@@ -1,50 +1,34 @@
 package com.ctg.stm.service.impl;
 
 import com.ctg.stm.domain.ProjectStatisticsBasicUnit;
+import com.ctg.stm.domain.Statistics;
 import com.ctg.stm.dto.MonthlyScientificResearchReportQueryDTO;
-import com.ctg.stm.repository.ProjectStatisticsBasicUnitRepository;
+import com.ctg.stm.repository.StatisticsRepository;
 import com.ctg.stm.service.PredicateCallBack;
-import com.ctg.stm.service.ProjectStatisticsBasicUnitService;
+import com.ctg.stm.service.StatisticsService;
 import com.ctg.stm.util.ProjectEnum;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-@Slf4j
-@Transactional
-public class ProjectStatisticsBasicUnitServiceImpl implements ProjectStatisticsBasicUnitService {
+public class StatisticsServiceImpl implements StatisticsService {
     @Autowired
-    private ProjectStatisticsBasicUnitRepository projectStatisticsBasicUnitRepository;
-
-
+    private StatisticsRepository statisticsRepository;
     @Override
-    public List<ProjectStatisticsBasicUnit> findAllProjectStatisticsBasicUnits() {
-        return projectStatisticsBasicUnitRepository.findAll();
+    public Statistics save(Statistics unit) {
+        return statisticsRepository.save(unit);
     }
 
     @Override
-    public ProjectStatisticsBasicUnit save(ProjectStatisticsBasicUnit unit) {
-        return projectStatisticsBasicUnitRepository.save(unit);
-    }
-
-    @Override
-    public List<ProjectStatisticsBasicUnit> findByMonthlyScientificResearchReportQueryDTO(
-            MonthlyScientificResearchReportQueryDTO queryDTO, PredicateCallBack predicateCallBack) {
-
-        Specification<ProjectStatisticsBasicUnit> spec = (root, query, cb) -> {
+    public List<Statistics> findByMonthlyScientificResearchReportQueryDTO(MonthlyScientificResearchReportQueryDTO queryDTO, PredicateCallBack predicateCallBack) {
+        Specification<Statistics> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
             // 日期范围查询（结合网页5[5](@ref)的日期处理）
@@ -57,8 +41,8 @@ public class ProjectStatisticsBasicUnitServiceImpl implements ProjectStatisticsB
             // 字符串类型精确匹配（参考网页2[2](@ref)的@NotBlank处理）
             addIfNotEmpty(predicates, root, cb, "principalUnit", queryDTO.getPrincipalUnit());
             addIfNotEmpty(predicates, root, cb, "businessSector", queryDTO.getBusinessSector());
-            addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttribute());
-           // addIfNotEmpty(predicates, root, cb, "projectCategory", queryDTO.getProjectCategory());
+            addIfNotEmpty(predicates, root, cb, "researchAttribute", queryDTO.getResearchAttribute());
+            // addIfNotEmpty(predicates, root, cb, "projectCategory", queryDTO.getProjectCategory());
 
             // 数值类型精确匹配（类似网页3[3](@ref)的@Min处理）
             if (queryDTO.getProjectLevel() != null) {
@@ -75,12 +59,11 @@ public class ProjectStatisticsBasicUnitServiceImpl implements ProjectStatisticsB
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        return projectStatisticsBasicUnitRepository.findAll(spec);
+        return statisticsRepository.findAll(spec);
     }
 
     @Override
-    public List<ProjectStatisticsBasicUnit> findProjectUnderDevelopment(MonthlyScientificResearchReportQueryDTO queryDTO) {
-
+    public List<Statistics> findProjectUnderDevelopment(MonthlyScientificResearchReportQueryDTO queryDTO) {
         PredicateCallBack predicateCallBack = (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
@@ -90,7 +73,11 @@ public class ProjectStatisticsBasicUnitServiceImpl implements ProjectStatisticsB
             return predicateList;
         };
         return findByMonthlyScientificResearchReportQueryDTO(queryDTO, predicateCallBack);
+    }
 
+    @Override
+    public List<Statistics> findAllStatistics() {
+        return statisticsRepository.findAll();
     }
 
     // 封装字符串字段的非空判断（参考网页7[7](@ref)的条件构建模式）
