@@ -7,8 +7,11 @@ import com.ctg.stm.repository.StatisticsRepository;
 import com.ctg.stm.service.PredicateCallBack;
 import com.ctg.stm.service.StatisticsService;
 import com.ctg.stm.util.ProjectEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -17,7 +20,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
-
+@Service
+@Slf4j
+@Transactional
 public class StatisticsServiceImpl implements StatisticsService {
     @Autowired
     private StatisticsRepository statisticsRepository;
@@ -31,14 +36,14 @@ public class StatisticsServiceImpl implements StatisticsService {
         Specification<Statistics> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            // 日期范围查询（结合网页5[5](@ref)的日期处理）
+            // 日期范围查询
             if (queryDTO.getStartDate() != null && queryDTO.getEndDate() != null) {
                 predicates.add(cb.between(root.get("statisticDate"),
                         queryDTO.getStartDate(),
                         queryDTO.getEndDate()));
             }
 
-            // 字符串类型精确匹配（参考网页2[2](@ref)的@NotBlank处理）
+            // 字符串类型精确匹配
             addIfNotEmpty(predicates, root, cb, "principalUnit", queryDTO.getPrincipalUnit());
             addIfNotEmpty(predicates, root, cb, "businessSector", queryDTO.getBusinessSector());
             addIfNotEmpty(predicates, root, cb, "researchAttribute", queryDTO.getResearchAttribute());
@@ -80,7 +85,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         return statisticsRepository.findAll();
     }
 
-    // 封装字符串字段的非空判断（参考网页7[7](@ref)的条件构建模式）
+
     private void addIfNotEmpty(List<Predicate> predicates, Root<?> root,
                                CriteriaBuilder cb, String fieldName, String value) {
         if (StringUtils.hasText(value)) {

@@ -2,12 +2,12 @@ package com.ctg.stm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,11 +15,18 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "STATISTICS")
+@NoArgsConstructor
+@Getter
+@Setter
 public class Statistics implements Serializable {
     @Id
     @Column(name = "ID")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ApiModelProperty(value = "项目ID")
+    @Column(name = "PROJECT_ID")
+    private Long projectId;
 
     @ApiModelProperty(value = "项目名")
     @Column(name = "PROJECT_NAME")
@@ -67,7 +74,7 @@ public class Statistics implements Serializable {
 
     @ApiModelProperty(value = "项目成果数量（累计）")
     @Column(name = "PROJECT_RESULT")
-    private int projectResult;
+    private Integer projectResult;
 
 
 
@@ -85,15 +92,15 @@ public class Statistics implements Serializable {
 
     @ApiModelProperty(value = "验收节点（待获取节点信息）")
     @Column(name = "ACCEPTANCE_POINT")
-    private int acceptancePoint;
+    private Integer acceptancePoint;
 
     @ApiModelProperty(value = "是否重点项目")
     @Column(name = "PROJECT_IMPORTANT")
-    private int projectImportant;
+    private Integer projectImportant;
 
     @ApiModelProperty(value = "流程状态")
     @Column(name = "BPM_STATUS")
-    private int bpmStatus;
+    private Integer bpmStatus;
 
 
 
