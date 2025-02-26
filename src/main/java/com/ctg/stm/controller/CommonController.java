@@ -20,7 +20,7 @@ import java.util.List;
  */
 @RestController
 
-@Api(value = "用户接口", tags = {"用户接口"})
+@Api(value = "测试接口，测试学生表增删改查", tags = {"测试接口，测试学生表增删改查"})
 public class CommonController {
 
     @Autowired
@@ -32,7 +32,7 @@ public class CommonController {
         return Result.success(studentList);
     }
     @RequestMapping(value = "/api/saveStudent", method = RequestMethod.POST)
-    @ApiOperation(value = "用户基本信息", notes = "保存用户信息")
+    @ApiOperation(value = "保存学生信息")
     public Result<Student> saveStudent(@RequestBody StudentDTO studentDTO){
         Student student = new Student();
         //student.setId(studentDTO.getId());
