@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,8 +14,12 @@ import java.time.LocalDate;
 public class Statistics implements Serializable {
     @Id
     @Column(name = "ID")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ApiModelProperty(value = "项目名ID")
+    @Column(name = "PROJECT_ID")
+    private String projectID;
 
     @ApiModelProperty(value = "项目名")
     @Column(name = "PROJECT_NAME")
@@ -53,8 +54,8 @@ public class Statistics implements Serializable {
     private String projectType;
 
     @ApiModelProperty(value = "研发属性（基础研究、应用基础研究、应用研究、技术与产品开发（试验发展、软科学研究）、其它")
-    @Column(name = "RESEARCH_ATTRIBUTE")
-    private String researchAttribute;
+    @Column(name = "RESEARCH_ATTRIBUTES")
+    private String researchAttributes;
 
     @ApiModelProperty(value = "项目金额")
     @Column(name = "TOTAL_FUNDS")
@@ -66,7 +67,7 @@ public class Statistics implements Serializable {
 
     @ApiModelProperty(value = "项目成果数量（累计）")
     @Column(name = "PROJECT_RESULT")
-    private int projectResult;
+    private Integer projectResult;
 
 //    @ApiModelProperty(value = "项目成果（近1月）")
 //    @Column(name = "PROJECT_RESULT_1")
@@ -120,6 +121,14 @@ public class Statistics implements Serializable {
     @ApiModelProperty(value = "流程状态")
     @Column(name = "BPM_STATUS")
     private int bpmStatus;
+
+    @ApiModelProperty(value = "项目所属领域 对应业务板块（水电、新能源、火电）")
+    @Column(name = "BUSINESS_SECTOR")
+    private String businessSector;
+
+    @ApiModelProperty(value = "项目所属专业")
+    @Column(name = "PROFESSIONAL")
+    private String professional;
 
 
 
