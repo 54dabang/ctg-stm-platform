@@ -6,16 +6,16 @@ import com.ctg.stm.repository.ProjectStatisticsBasicUnitRepository;
 import com.ctg.stm.service.PredicateCallBack;
 import com.ctg.stm.service.ProjectStatisticsBasicUnitService;
 import com.ctg.stm.util.ProjectEnum;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
+import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.*;
@@ -28,6 +28,8 @@ import java.util.List;
 public class ProjectStatisticsBasicUnitServiceImpl implements ProjectStatisticsBasicUnitService {
     @Autowired
     private ProjectStatisticsBasicUnitRepository projectStatisticsBasicUnitRepository;
+    @Autowired
+    private EntityManager entityManager;
 
 
     @Override
@@ -45,7 +47,7 @@ public class ProjectStatisticsBasicUnitServiceImpl implements ProjectStatisticsB
             MonthlyScientificResearchReportQueryDTO queryDTO, PredicateCallBack predicateCallBack) {
 
         Specification<ProjectStatisticsBasicUnit> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
+            List<Predicate> predicates = buildPredicates(root,cb,queryDTO);
 
             // 日期范围查询（结合网页5[5](@ref)的日期处理）
             if (queryDTO.getStartDate() != null && queryDTO.getEndDate() != null) {
@@ -54,11 +56,7 @@ public class ProjectStatisticsBasicUnitServiceImpl implements ProjectStatisticsB
                         queryDTO.getEndDate()));
             }
 
-            // 字符串类型精确匹配（参考网页2[2](@ref)的@NotBlank处理）
-            addIfNotEmpty(predicates, root, cb, "principalUnit", queryDTO.getPrincipalUnit());
-            addIfNotEmpty(predicates, root, cb, "businessSector", queryDTO.getBusinessSector());
-            addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttributes());
-           // addIfNotEmpty(predicates, root, cb, "projectCategory", queryDTO.getProjectCategory());
+
 
             // 数值类型精确匹配（类似网页3[3](@ref)的@Min处理）
             if (queryDTO.getProjectLevel() != null) {
@@ -95,9 +93,18 @@ public class ProjectStatisticsBasicUnitServiceImpl implements ProjectStatisticsB
 
     // 封装字符串字段的非空判断（参考网页7[7](@ref)的条件构建模式）
     private void addIfNotEmpty(List<Predicate> predicates, Root<?> root,
-                               CriteriaBuilder cb, String fieldName, String value) {
-        if (StringUtils.hasText(value)) {
+                               CriteriaBuilder cb, String fieldName, Object value) {
+        if (Objects.isNull(value)) {
             predicates.add(cb.equal(root.get(fieldName), value));
         }
+    }
+
+    private  List<Predicate> buildPredicates(Root<?> root,CriteriaBuilder cb,MonthlyScientificResearchReportQueryDTO queryDTO){
+        List<Predicate> predicates = Lists.newArrayList();
+        addIfNotEmpty(predicates, root, cb, "principalUnit", queryDTO.getPrincipalUnit());
+        addIfNotEmpty(predicates, root, cb, "businessSector", queryDTO.getBusinessSector());
+        addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttribute());
+
+        return predicates;
     }
 }

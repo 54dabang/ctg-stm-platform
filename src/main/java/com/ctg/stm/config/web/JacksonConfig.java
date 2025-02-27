@@ -64,7 +64,7 @@ public class JacksonConfig {
         // Include.NON_DEFAULT 属性为默认值不序列化
         // Include.NON_EMPTY 属性为 空（""） 或者为 NULL 都不序列化，则返回的json是没有这个字段的
         // Include.NON_NULL 属性为NULL 不序列化
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.ALWAYS);
         // 允许出现特殊字符和转义符
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
         // 允许出现单引号
