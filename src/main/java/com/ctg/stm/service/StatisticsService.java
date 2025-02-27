@@ -2,10 +2,9 @@ package com.ctg.stm.service;
 
 import com.ctg.stm.domain.Statistics;
 import com.ctg.stm.dto.MonthlyScientificResearchReportQueryDTO;
-import com.ctg.stm.vo.ProjectCountGroupByBpmStatusVO;
-import com.ctg.stm.vo.ProjectCountGroupByProjectCategoryVO;
-import com.ctg.stm.vo.ProjectResultCountGroupByProjectCategoryVO;
+import com.ctg.stm.vo.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface StatisticsService {
@@ -18,10 +17,24 @@ public interface StatisticsService {
 
     List<Statistics> findAllStatistics();
 
-    List<ProjectCountGroupByBpmStatusVO> coutProjectNumGroupByProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO);
+    List<ProjectCountGroupByBpmStatusVO> countProjectNumGroupByProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO);
 
-    List<ProjectCountGroupByProjectCategoryVO> coutProjectNumGroupByProjectCategoryUnderDevelopment(MonthlyScientificResearchReportQueryDTO queryDTO);
+    List<ProjectCountGroupByProjectCategoryVO> countProjectNumGroupByProjectCategoryUnderDevelopment(MonthlyScientificResearchReportQueryDTO queryDTO);
 
-    List<ProjectResultCountGroupByProjectCategoryVO> coutProjectResultGroupByProjectCategory(MonthlyScientificResearchReportQueryDTO queryDTO);
+    List<ProjectResultCountGroupByProjectCategoryVO> countProjectResultGroupByProjectCategory(MonthlyScientificResearchReportQueryDTO queryDTO);
+
+    List<Statistics> findImportantProjectTotalFunds(MonthlyScientificResearchReportQueryDTO queryDTO);
+
+    Long countProjectNumUnderDevelopment(MonthlyScientificResearchReportQueryDTO queryDTO);
+
+    Long countProjectNumUnderAcceptance(MonthlyScientificResearchReportQueryDTO queryDTO);
+
+    Integer sumProjectResult(MonthlyScientificResearchReportQueryDTO queryDTO);
+    BigDecimal sumProjectTotalFunds(MonthlyScientificResearchReportQueryDTO queryDTO);
+
+
+    List<ProjectPrincipalUnitBpmStatusVO> countProjectNumGroupByPrincipalUnitAndProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO);
+
+    List<ProjectfundsGroupByPrincipalUnitVO> countProjectTotalFundsGroupByPrincipalUnit(MonthlyScientificResearchReportQueryDTO queryDTO);
 
 }

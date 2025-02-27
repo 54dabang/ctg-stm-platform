@@ -73,12 +73,9 @@ public class JacksonConfig {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         SimpleModule simpleModule = new SimpleModule();
-        /**
-         *  将Long,BigInteger序列化的时候,转化为String
-         */
-        simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
+        //simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
         simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
-        simpleModule.addSerializer(BigInteger.class, ToStringSerializer.instance);
+        //simpleModule.addSerializer(BigInteger.class, ToStringSerializer.instance);
 
         objectMapper.registerModule(simpleModule);
 
