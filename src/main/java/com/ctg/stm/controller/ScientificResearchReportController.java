@@ -1,9 +1,9 @@
 package com.ctg.stm.controller;
 
-import com.ctg.stm.domain.ProjectStatisticsBasicUnit;
 import com.ctg.stm.domain.Statistics;
 import com.ctg.stm.dto.MonthlyScientificResearchReportQueryDTO;
-import com.ctg.stm.service.ProjectStatisticsBasicUnitService;
+import com.ctg.stm.dto.BpmStatusGroupDTO;
+import com.ctg.stm.dto.ProjectCategoryGroupDTO;
 import com.ctg.stm.service.StatisticsService;
 import com.ctg.stm.util.ProjectEnum;
 import com.ctg.stm.util.Result;
@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -27,9 +28,9 @@ public class ScientificResearchReportController {
     @Autowired
     private StatisticsService statisticsService;
 
-    @ApiOperation(value = "项目整体情况")
-    @RequestMapping(value = "/api/projectOverallSituation", method = RequestMethod.POST)
-    public Result projectOverallSituation(@RequestBody MonthlyScientificResearchReportQueryDTO queryDTO) {
+    @ApiOperation(value = "项目整体情况，基于查询全表实现")
+    @RequestMapping(value = "/api/projectOverallSituation2", method = RequestMethod.POST)
+    public Result projectOverallSituation2(@RequestBody MonthlyScientificResearchReportQueryDTO queryDTO) {
 
         List<Statistics> list = statisticsService.findByMonthlyScientificResearchReportQueryDTO(queryDTO, null);
         Map<Integer, Long> statusCountMap = list.stream()
@@ -57,26 +58,35 @@ public class ScientificResearchReportController {
         return Result.success(finalResult);
     }
 
+    @ApiOperation(value = "项目整体情况")
+    @RequestMapping(value = "/api/projectOverallSituation", method = RequestMethod.POST)
+    public Result projectOverallSituation(@RequestBody MonthlyScientificResearchReportQueryDTO queryDTO) {
+        List<BpmStatusGroupDTO> list = statisticsService.groupByProBpmStatus(queryDTO);
+        Map<Integer, Long> statusCountMap =  new HashMap<>();
+        list.forEach(item->{
+            statusCountMap.put(item.getProBpmStatus(),item.getCount());
+        });
+        Map<String, Long> finalResult = ProjectEnum.ProBpmStatus.getValueList().stream()
+                .collect(Collectors.toMap(
+                        status -> ProjectEnum.ProBpmStatus.getByValue(status).desc(),
+                        status -> statusCountMap.getOrDefault(status, 0L)
+                ));
+        return Result.success(finalResult);
+    }
+
     @ApiOperation(value = "在研项目数")
     @RequestMapping(value = "/api/projectProcessing", method = RequestMethod.POST)
     public Result projectProcessing(@RequestBody MonthlyScientificResearchReportQueryDTO queryDTO) {
 
-        List<Statistics> list = statisticsService.findProjectUnderDevelopment(queryDTO);
-        Map<String, Long> statusCountMap = list.stream()
-                .filter(unit -> unit.getProjectCategory() != null)
-                .collect(Collectors.groupingBy(
-                        Statistics::getProjectCategory,
-                        Collectors.counting()
-                ));
-
-        // 获取枚举所有状态描述列表
-        List<String> allStatusDescList = ProjectEnum.ProjectCategory.getDescList();
-
-        // 补全缺失状态并设置默认值0
-        Map<String, Long> result = allStatusDescList.stream()
+        List<ProjectCategoryGroupDTO>  categoryGroupDTOList = statisticsService.groupByProjectCategoryUnderDevelopment(queryDTO);
+        Map<String,Long> result = ProjectEnum.ProjectCategory.getDescList().stream()
                 .collect(Collectors.toMap(
-                        Function.identity(),
-                        desc -> statusCountMap.getOrDefault(desc, 0L)
+                        projectCategory->projectCategory,
+                        projectCategory->categoryGroupDTOList.stream()
+                                .filter(item->item.getProjectCategory().equals(projectCategory))
+                                .map(ProjectCategoryGroupDTO::getCount)
+                                .findFirst()
+                                .orElse(0L)
                 ));
 
         return Result.success(result);

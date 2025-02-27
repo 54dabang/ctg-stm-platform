@@ -64,6 +64,10 @@ public class Statistics implements Serializable {
     @Column(name = "RESEARCH_ATTRIBUTE")
     private String researchAttribute;
 
+    @ApiModelProperty(value = "项目所属领域 对应业务板块（水电、新能源、火电）")
+    @Column(name = "BUSINESS_SECTOR")
+    private String businessSector;
+
     @ApiModelProperty(value = "项目金额")
     @Column(name = "TOTAL_FUNDS")
     private BigDecimal totalFunds;
