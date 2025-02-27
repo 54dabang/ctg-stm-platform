@@ -130,6 +130,11 @@ public class Statistics implements Serializable {
     @Column(name = "PROFESSIONAL")
     private String professional;
 
+    @ApiModelProperty(value = "重点项目划分（国家级、省部级、怀柔实验室）")
+    @Column(name = "PROJECT_RANK")
+    private String projectRank;
+
+
 
 
 }
