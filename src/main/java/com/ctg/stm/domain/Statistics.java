@@ -87,12 +87,9 @@ public class Statistics implements Serializable {
     private BigDecimal projectfunds;
 
 
-
     @ApiModelProperty(value = "项目执行（立项中、执行中、验收阶段）")
     @Column(name = "PROJECT_STATUS")
     private String projectStatus;
-
-
 
     @ApiModelProperty(value = "验收节点（待获取节点信息）")
     @Column(name = "ACCEPTANCE_POINT")

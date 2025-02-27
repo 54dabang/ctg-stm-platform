@@ -2,11 +2,12 @@ package com.ctg.stm.controller;
 
 import com.ctg.stm.domain.Statistics;
 import com.ctg.stm.dto.MonthlyScientificResearchReportQueryDTO;
-import com.ctg.stm.dto.BpmStatusGroupDTO;
-import com.ctg.stm.dto.ProjectCategoryGroupDTO;
+import com.ctg.stm.vo.ProjectCountGroupByBpmStatusVO;
+import com.ctg.stm.vo.ProjectCountGroupByProjectCategoryVO;
 import com.ctg.stm.service.StatisticsService;
 import com.ctg.stm.util.ProjectEnum;
 import com.ctg.stm.util.Result;
+import com.ctg.stm.vo.ProjectResultCountGroupByProjectCategoryVO;
 import com.ctg.stm.vo.StatisticsVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -61,7 +62,7 @@ public class ScientificResearchReportController {
     @ApiOperation(value = "项目整体情况")
     @RequestMapping(value = "/api/projectOverallSituation", method = RequestMethod.POST)
     public Result projectOverallSituation(@RequestBody MonthlyScientificResearchReportQueryDTO queryDTO) {
-        List<BpmStatusGroupDTO> list = statisticsService.groupByProBpmStatus(queryDTO);
+        List<ProjectCountGroupByBpmStatusVO> list = statisticsService.coutProjectNumGroupByProBpmStatus(queryDTO);
         Map<Integer, Long> statusCountMap =  new HashMap<>();
         list.forEach(item->{
             statusCountMap.put(item.getProBpmStatus(),item.getCount());
@@ -78,20 +79,37 @@ public class ScientificResearchReportController {
     @RequestMapping(value = "/api/projectProcessing", method = RequestMethod.POST)
     public Result projectProcessing(@RequestBody MonthlyScientificResearchReportQueryDTO queryDTO) {
 
-        List<ProjectCategoryGroupDTO>  categoryGroupDTOList = statisticsService.groupByProjectCategoryUnderDevelopment(queryDTO);
+        List<ProjectCountGroupByProjectCategoryVO>  categoryGroupDTOList = statisticsService.coutProjectNumGroupByProjectCategoryUnderDevelopment(queryDTO);
         Map<String,Long> result = ProjectEnum.ProjectCategory.getDescList().stream()
                 .collect(Collectors.toMap(
                         projectCategory->projectCategory,
                         projectCategory->categoryGroupDTOList.stream()
                                 .filter(item->item.getProjectCategory().equals(projectCategory))
-                                .map(ProjectCategoryGroupDTO::getCount)
                                 .findFirst()
+                                .map(ProjectCountGroupByProjectCategoryVO::getCount)
                                 .orElse(0L)
                 ));
 
         return Result.success(result);
     }
 
+    @ApiOperation(value = "科研成果数")
+    @RequestMapping(value = "/api/projectResult", method = RequestMethod.POST)
+    public Result projectResult(@RequestBody MonthlyScientificResearchReportQueryDTO queryDTO) {
+
+        List<ProjectResultCountGroupByProjectCategoryVO>  categoryGroupDTOList = statisticsService.coutProjectResultGroupByProjectCategory(queryDTO);
+        Map<String,Long> result = ProjectEnum.ProjectCategory.getDescList().stream()
+                .collect(Collectors.toMap(
+                        projectCategory->projectCategory,
+                        projectCategory->categoryGroupDTOList.stream()
+                                .filter(item->item.getProjectCategory().equals(projectCategory))
+                                .findFirst()
+                                .map(ProjectResultCountGroupByProjectCategoryVO::getCount)
+                                .orElse(0L)
+                ));
+
+        return Result.success(result);
+    }
     @ApiOperation(value = "保存项目基本统计单元")
     @RequestMapping(value = "/api/saveStatistics", method = RequestMethod.POST)
     public Result saveStatistics(@RequestBody Statistics statistics) {

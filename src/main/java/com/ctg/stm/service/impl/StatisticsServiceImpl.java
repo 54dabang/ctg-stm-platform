@@ -2,12 +2,13 @@ package com.ctg.stm.service.impl;
 
 import com.ctg.stm.domain.Statistics;
 import com.ctg.stm.dto.MonthlyScientificResearchReportQueryDTO;
-import com.ctg.stm.dto.BpmStatusGroupDTO;
-import com.ctg.stm.dto.ProjectCategoryGroupDTO;
+import com.ctg.stm.vo.ProjectCountGroupByBpmStatusVO;
+import com.ctg.stm.vo.ProjectCountGroupByProjectCategoryVO;
 import com.ctg.stm.repository.StatisticsRepository;
 import com.ctg.stm.service.PredicateCallBack;
 import com.ctg.stm.service.StatisticsService;
 import com.ctg.stm.util.ProjectEnum;
+import com.ctg.stm.vo.ProjectResultCountGroupByProjectCategoryVO;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,7 +104,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<ProjectCategoryGroupDTO> groupByProjectCategoryUnderDevelopment(MonthlyScientificResearchReportQueryDTO queryDTO) {
+    public List<ProjectCountGroupByProjectCategoryVO> coutProjectNumGroupByProjectCategoryUnderDevelopment(MonthlyScientificResearchReportQueryDTO queryDTO) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
         Root<Statistics> root = cq.from(Statistics.class);
@@ -128,13 +129,39 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<Object[]> results = entityManager.createQuery(cq).getResultList();
         // 结果转换
         return results.stream()
-                .map(arr -> new ProjectCategoryGroupDTO(
+                .map(arr -> new ProjectCountGroupByProjectCategoryVO(
                         (String) arr[0], (Long)arr[1]))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BpmStatusGroupDTO> groupByProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO) {
+    public List<ProjectResultCountGroupByProjectCategoryVO> coutProjectResultGroupByProjectCategory(MonthlyScientificResearchReportQueryDTO queryDTO) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+        Root<Statistics> root = cq.from(Statistics.class);
+
+        // 构建统计字段
+        cq.multiselect(
+                root.get("projectCategory"),  // 分组字段
+                cb.sum(root.get("projectResult"))     // 统计数量
+        );
+
+        // 动态条件构建
+        List<Predicate> predicates = buildPredicates(root,cb,queryDTO);
+        cq.where(predicates.toArray(new Predicate[0]));
+        // 分组配置
+        cq.groupBy(root.get("projectCategory"));
+        // 执行数据库层面分组查询
+        List<Object[]> results = entityManager.createQuery(cq).getResultList();
+        // 结果转换
+        return results.stream()
+                .map(arr -> new ProjectResultCountGroupByProjectCategoryVO(
+                        (String) arr[0], (Long)arr[1]))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProjectCountGroupByBpmStatusVO> coutProjectNumGroupByProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
         Root<Statistics> root = cq.from(Statistics.class);
@@ -156,7 +183,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<Object[]> results = entityManager.createQuery(cq).getResultList();
         // 结果转换
         return results.stream()
-                .map(arr -> new BpmStatusGroupDTO(
+                .map(arr -> new ProjectCountGroupByBpmStatusVO(
                         (Integer) arr[0], (Long)arr[1]))
                 .collect(Collectors.toList());
     }

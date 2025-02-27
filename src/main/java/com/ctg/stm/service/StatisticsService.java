@@ -2,8 +2,9 @@ package com.ctg.stm.service;
 
 import com.ctg.stm.domain.Statistics;
 import com.ctg.stm.dto.MonthlyScientificResearchReportQueryDTO;
-import com.ctg.stm.dto.BpmStatusGroupDTO;
-import com.ctg.stm.dto.ProjectCategoryGroupDTO;
+import com.ctg.stm.vo.ProjectCountGroupByBpmStatusVO;
+import com.ctg.stm.vo.ProjectCountGroupByProjectCategoryVO;
+import com.ctg.stm.vo.ProjectResultCountGroupByProjectCategoryVO;
 
 import java.util.List;
 
@@ -17,8 +18,10 @@ public interface StatisticsService {
 
     List<Statistics> findAllStatistics();
 
-    List<BpmStatusGroupDTO> groupByProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO);
+    List<ProjectCountGroupByBpmStatusVO> coutProjectNumGroupByProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO);
 
-    List<ProjectCategoryGroupDTO> groupByProjectCategoryUnderDevelopment(MonthlyScientificResearchReportQueryDTO queryDTO);
+    List<ProjectCountGroupByProjectCategoryVO> coutProjectNumGroupByProjectCategoryUnderDevelopment(MonthlyScientificResearchReportQueryDTO queryDTO);
+
+    List<ProjectResultCountGroupByProjectCategoryVO> coutProjectResultGroupByProjectCategory(MonthlyScientificResearchReportQueryDTO queryDTO);
 
 }
