@@ -361,6 +361,76 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     }
 
+    @Override
+    public List<ImportantProjectCountGroupByRankVO> countImportantProjectNumGroupByRank(MonthlyScientificResearchReportQueryDTO queryDTO) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+        Root<Statistics> root = cq.from(Statistics.class);
+
+        // 构建统计字段
+        cq.multiselect(
+                root.get("rank"),  // 分组字段
+                cb.count(root.get("id"))     // 统计数量
+        );
+
+        // 动态条件构建
+        PredicateCallBack predicateCallBack = new PredicateCallBack() {
+            @Override
+            public List<Predicate> toPredicates(Root rt, CriteriaQuery query, CriteriaBuilder cb) {
+                return Arrays.asList(cb.equal(root.get("projectImportant"),Integer.valueOf(Constants.ALL_YES)));
+            }
+        };
+
+        Predicate predicate = buildSpecification(root,cq, cb, queryDTO,predicateCallBack);
+        cq.where(predicate);
+
+        // 分组配置
+        cq.groupBy(root.get("rank"));
+
+        // 执行数据库层面分组查询
+        List<Object[]> results = entityManager.createQuery(cq).getResultList();
+        // 结果转换
+        return results.stream()
+                .map(arr -> new ImportantProjectCountGroupByRankVO(
+                        (String) arr[0], (Long) arr[1]))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImportantProjectSumFundsGroupByRankVO> countImportantProjectSumFundsGroupByRank(MonthlyScientificResearchReportQueryDTO queryDTO) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+        Root<Statistics> root = cq.from(Statistics.class);
+
+        // 构建统计字段
+        cq.multiselect(
+                root.get("rank"),  // 分组字段
+                cb.sum(root.get("projectfunds"))     // 统计数量
+        );
+
+        // 动态条件构建
+        PredicateCallBack predicateCallBack = new PredicateCallBack() {
+            @Override
+            public List<Predicate> toPredicates(Root rt, CriteriaQuery query, CriteriaBuilder cb) {
+                return Arrays.asList(cb.equal(root.get("projectImportant"),Integer.valueOf(Constants.ALL_YES)));
+            }
+        };
+
+        Predicate predicate = buildSpecification(root,cq, cb, queryDTO,predicateCallBack);
+        cq.where(predicate);
+
+        // 分组配置
+        cq.groupBy(root.get("rank"));
+
+        // 执行数据库层面分组查询
+        List<Object[]> results = entityManager.createQuery(cq).getResultList();
+        // 结果转换
+        return results.stream()
+                .map(arr -> new ImportantProjectSumFundsGroupByRankVO(
+                        (String) arr[0], (BigDecimal) arr[1]))
+                .collect(Collectors.toList());
+    }
+
     Predicate buildSpecification(Root<?> root, CriteriaQuery cq, CriteriaBuilder cb, MonthlyScientificResearchReportQueryDTO queryDTO, PredicateCallBack predicateCallBack) {
         List<Predicate> predicates = new ArrayList<>();
 

@@ -37,4 +37,8 @@ public interface StatisticsService {
 
     List<ProjectfundsGroupByPrincipalUnitVO> countProjectTotalFundsGroupByPrincipalUnit(MonthlyScientificResearchReportQueryDTO queryDTO);
 
+    List<ImportantProjectCountGroupByRankVO> countImportantProjectNumGroupByRank(MonthlyScientificResearchReportQueryDTO queryDTO);
+
+    List<ImportantProjectSumFundsGroupByRankVO> countImportantProjectSumFundsGroupByRank(MonthlyScientificResearchReportQueryDTO queryDTO);
+
 }

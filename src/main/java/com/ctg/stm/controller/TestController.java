@@ -1,8 +1,7 @@
 package com.ctg.stm.controller;
 
 
-import com.ctg.stm.domain.Student;
-import com.ctg.stm.repository.StudentRepository;
+
 import com.ctg.stm.service.impl.StatisticsSchedulerServiceImpl;
 import com.ctg.stm.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;

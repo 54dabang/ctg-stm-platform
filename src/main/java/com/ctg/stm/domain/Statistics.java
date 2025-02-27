@@ -2,6 +2,9 @@ package com.ctg.stm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -11,6 +14,9 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "STATISTICS")
+@NoArgsConstructor
+@Getter
+@Setter
 public class Statistics implements Serializable {
     @Id
     @Column(name = "ID")
@@ -112,15 +118,15 @@ public class Statistics implements Serializable {
 
     @ApiModelProperty(value = "验收节点（待获取节点信息）")
     @Column(name = "ACCEPTANCE_POINT")
-    private int acceptancePoint;
+    private Integer acceptancePoint;
 
     @ApiModelProperty(value = "是否重点项目")
     @Column(name = "PROJECT_IMPORTANT")
-    private int projectImportant;
+    private Integer projectImportant;
 
     @ApiModelProperty(value = "流程状态")
     @Column(name = "BPM_STATUS")
-    private int bpmStatus;
+    private Integer bpmStatus;
 
     @ApiModelProperty(value = "项目所属领域 对应业务板块（水电、新能源、火电）")
     @Column(name = "BUSINESS_SECTOR")
