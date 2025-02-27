@@ -340,8 +340,26 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
 
 
             String bpmStatus = (String) columns[11];//流程状态
+            String projectStatus; //项目状态
+            if (bpmStatus == null) {
+                projectStatus = "项目状态数据缺失";
+            }else{
+                try {
+                    double bpm = Double.parseDouble(bpmStatus);
+                    if(bpm < 39){
+                        projectStatus = "立项阶段";
+                    }else if(bpm > 39 && bpm < 79){
+                        projectStatus = "验收阶段";
+                    }else{
+                        projectStatus = "实施阶段";
+                    }
+                } catch (NumberFormatException e) {
+                    projectStatus = "项目状态数据异常";
+                }
+            }
 
-            String insertSql = "INSERT INTO STATISTICS (PROJECT_ID, PROJECT_NAME, PRINCIPAL_UNIT, PRINCIPAL_NAME, PROJECT_CATEGORY, PROJECT_TYPE, PROJECT_LEVEL, TOTAL_FUNDS, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            String insertSql = "INSERT INTO STATISTICS (PROJECT_ID, PROJECT_NAME, PRINCIPAL_UNIT, PRINCIPAL_NAME, PROJECT_CATEGORY, PROJECT_TYPE, PROJECT_LEVEL, TOTAL_FUNDS, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS, PROJECT_STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             entityManager.createNativeQuery(insertSql)
                     .setParameter(1, projectID)
                     .setParameter(2, projectName)
@@ -355,6 +373,7 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
                     .setParameter(10, businessSector)
                     .setParameter(11, professional)
                     .setParameter(12, bpmStatus)
+                    .setParameter(13, projectStatus)
                     .executeUpdate();
         }
 
