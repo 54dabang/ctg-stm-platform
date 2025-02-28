@@ -2,6 +2,8 @@ package com.ctg.stm.service.impl;
 
 import com.ctg.stm.domain.Statistics;
 import com.ctg.stm.dto.MonthlyScientificResearchReportQueryDTO;
+import com.ctg.stm.dto.ProjectQueryDetailDTO;
+import com.ctg.stm.dto.StatisticsSearchDTO;
 import com.ctg.stm.util.Constants;
 import com.ctg.stm.vo.*;
 import com.ctg.stm.repository.StatisticsRepository;
@@ -46,6 +48,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     public Statistics save(Statistics unit) {
         return statisticsRepository.save(unit);
     }
+
+    @Override
+    public Statistics findOne(Long id) {
+        return statisticsRepository.findById(id).get();
+    }
+
 
     @Override
     public List<Statistics> findByMonthlyScientificResearchReportQueryDTO(MonthlyScientificResearchReportQueryDTO queryDTO, PredicateCallBack predicateCallBack) {
@@ -192,7 +200,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         cq.multiselect(
                 root.get("principalUnit"),
-                cb.sum(root.get("projectfunds"))      // 累加项目太投入
+                cb.sum(root.get("projectfunds"))      // 累加项目投入
         );
 
         // 动态条件构建（保留原有过滤逻辑）
@@ -362,14 +370,14 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<ImportantProjectCountGroupByRankVO> countImportantProjectNumGroupByRank(MonthlyScientificResearchReportQueryDTO queryDTO) {
+    public List<ImportantProjectCountGroupByRankVO> countImportantProjectNumGroupByRank() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
         Root<Statistics> root = cq.from(Statistics.class);
 
         // 构建统计字段
         cq.multiselect(
-                root.get("rank"),  // 分组字段
+                root.get("projectRank"),  // 分组字段
                 cb.count(root.get("id"))     // 统计数量
         );
 
@@ -380,12 +388,13 @@ public class StatisticsServiceImpl implements StatisticsService {
                 return Arrays.asList(cb.equal(root.get("projectImportant"),Integer.valueOf(Constants.ALL_YES)));
             }
         };
+        MonthlyScientificResearchReportQueryDTO queryDTO = new MonthlyScientificResearchReportQueryDTO();
 
         Predicate predicate = buildSpecification(root,cq, cb, queryDTO,predicateCallBack);
         cq.where(predicate);
 
         // 分组配置
-        cq.groupBy(root.get("rank"));
+        cq.groupBy(root.get("projectRank"));
 
         // 执行数据库层面分组查询
         List<Object[]> results = entityManager.createQuery(cq).getResultList();
@@ -397,14 +406,14 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<ImportantProjectSumFundsGroupByRankVO> countImportantProjectSumFundsGroupByRank(MonthlyScientificResearchReportQueryDTO queryDTO) {
+    public List<ImportantProjectSumFundsGroupByRankVO> countImportantProjectSumFundsGroupByRank() {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
         Root<Statistics> root = cq.from(Statistics.class);
 
         // 构建统计字段
         cq.multiselect(
-                root.get("rank"),  // 分组字段
+                root.get("projectRank"),  // 分组字段
                 cb.sum(root.get("projectfunds"))     // 统计数量
         );
 
@@ -416,11 +425,13 @@ public class StatisticsServiceImpl implements StatisticsService {
             }
         };
 
+        MonthlyScientificResearchReportQueryDTO queryDTO = new MonthlyScientificResearchReportQueryDTO();
+
         Predicate predicate = buildSpecification(root,cq, cb, queryDTO,predicateCallBack);
         cq.where(predicate);
 
         // 分组配置
-        cq.groupBy(root.get("rank"));
+        cq.groupBy(root.get("projectRank"));
 
         // 执行数据库层面分组查询
         List<Object[]> results = entityManager.createQuery(cq).getResultList();
@@ -432,6 +443,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     Predicate buildSpecification(Root<?> root, CriteriaQuery cq, CriteriaBuilder cb, MonthlyScientificResearchReportQueryDTO queryDTO, PredicateCallBack predicateCallBack) {
+
         List<Predicate> predicates = new ArrayList<>();
 
         // 日期范围查询
@@ -468,5 +480,57 @@ public class StatisticsServiceImpl implements StatisticsService {
         addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttribute());
 
         return predicates;
+    }
+
+    @Override
+    public Page<Statistics> findAll(Pageable pageable, Specification specification) {
+        // 执行分页查询
+        Page<Statistics> page = statisticsRepository.findAll(specification, pageable);
+
+        // 封装返回结果
+        PageVO<Statistics> result = new PageVO<>();
+        result.setTotal(page.getTotalElements());
+        result.setPages(page.getTotalPages());
+        result.setCurrent(page.getNumber()); // 当前页码（从0开始）
+        result.setSize(page.getSize());
+        result.setRecords(page.getContent());
+
+        return page;
+    }
+
+    @Override
+    public Page<Statistics> importantProjectPage(StatisticsSearchDTO searchDTO) {
+        // 构造Pageable对象
+        Pageable pageable = buildPage(searchDTO);
+
+        // 构造动态筛选条件（假设关键词匹配多个字段）
+        Specification<Statistics> spec = (root, query, criteriaBuilder) -> {
+            // 关键字匹配多个字段
+            return criteriaBuilder.or(
+                    criteriaBuilder.like(root.get("projectName"), "%" + searchDTO.getKeywords() + "%")
+            );
+        };
+        return this.findAll(pageable,spec);
+    }
+
+
+    private Pageable buildPage(StatisticsSearchDTO searchDTO){
+        Sort sort = Sort.by(searchDTO.getOrder().equalsIgnoreCase("asc") ? Sort.Order.asc(searchDTO.getSort()) : Sort.Order.desc(searchDTO.getSort()));
+        return PageRequest.of(searchDTO.getCurrent(), searchDTO.getSize(), sort);
+    }
+    @Override
+    public Page<Statistics> statisticspage(ProjectQueryDetailDTO projectQueryDetailDTO) {
+        Pageable pageable = buildPage(projectQueryDetailDTO.getSearchDTO());
+        Specification<Statistics> spec = (root, query, cb) -> {
+            PredicateCallBack predicateCallBack = new PredicateCallBack() {
+                @Override
+                public List<Predicate> toPredicates(Root rt, CriteriaQuery query, CriteriaBuilder cb) {
+                    Predicate predicate =  cb.like(root.get("projectName"), "%" + projectQueryDetailDTO.getSearchDTO().getKeywords() + "%");
+                    return Arrays.asList(predicate);
+                }
+            };
+            return buildSpecification(root, query, cb, projectQueryDetailDTO.getMonthlyScientificResearchReportQueryDTO(), predicateCallBack);
+        };
+        return this.findAll(pageable, spec);
     }
 }
