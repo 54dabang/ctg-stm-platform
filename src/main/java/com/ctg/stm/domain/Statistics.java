@@ -118,7 +118,7 @@ public class Statistics implements Serializable {
 
     @ApiModelProperty(value = "验收节点（待获取节点信息）")
     @Column(name = "ACCEPTANCE_POINT")
-    private Integer acceptancePoint;
+    private String acceptancePoint;
 
     @ApiModelProperty(value = "是否重点项目")
     @Column(name = "PROJECT_IMPORTANT")
@@ -126,6 +126,7 @@ public class Statistics implements Serializable {
 
     @ApiModelProperty(value = "流程状态")
     @Column(name = "BPM_STATUS")
+    //需要改成String
     private Integer bpmStatus;
 
     @ApiModelProperty(value = "项目所属领域 对应业务板块（水电、新能源、火电）")

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 
 @Service
@@ -341,6 +342,8 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
 
             String bpmStatus = (String) columns[11];//流程状态
             String projectStatus; //项目状态
+            String acceptancePoint = ""; //所处验收节点
+            BigDecimal projectFunds = null; //研发投入
             if (bpmStatus == null) {
                 projectStatus = "项目状态数据缺失";
             }else{
@@ -350,16 +353,53 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
                         projectStatus = "立项阶段";
                     }else if(bpm > 39 && bpm < 79){
                         projectStatus = "验收阶段";
+                        if(bpm==41.1){
+                            acceptancePoint = "发起验收申请";
+                        }else if (bpm==41.2){
+                            acceptancePoint = "立项单位（部门）审核";
+                        }else if (bpm==41.3){
+                            acceptancePoint = "二级单位科技部门经办人审核";
+                        }else if (bpm==41.4){
+                            acceptancePoint = "二级单位科技部门审核";
+                        }else if (bpm==41.5){
+                            acceptancePoint = "集团科创部经办人审核";
+                        }else if (bpm==41.52){
+                            acceptancePoint = "专业部门经办人";
+                        }else if (bpm==41.6){
+                            acceptancePoint = "集团科创部内部审核";
+                        }
                     }else{
                         projectStatus = "实施阶段";
+                        Random random = new Random();
+                        // 生成 a 到 b 之间的随机整数
+
+                        assert totalFunds != null;
+                        if(totalFunds.compareTo(BigDecimal.ZERO)>0) {
+                            projectFunds = totalFunds.multiply(BigDecimal.valueOf(Math.random()));
+                        }
+
                     }
                 } catch (NumberFormatException e) {
-                    projectStatus = "项目状态数据异常";
+                    //bpm =999为流程作废，暂不能确定是处于立项阶段还是验收阶段
+                    projectStatus = "暂无法确定";
                 }
             }
 
+            //项目成果数
+            int projectResult = 0;
+            String countProjectResult = "SELECT COUNT(*) as PROJECT_RESULT FROM STMS.MA_PRJ_E_S_PROJECT_CGJL_TD WHERE PROJECT_ID = ?1  GROUP BY PROJECT_ID HAVING COUNT(*) > 1";
+            Query queryResult = entityManager.createNativeQuery(countProjectResult);
+            queryResult.setParameter(1, projectID);
+            if (!queryResult.getResultList().isEmpty()) {
+                projectResult = Integer.parseInt(queryResult.getResultList().get(0).toString());
+            }else{
+                projectResult = 0;
+            }
 
-            String insertSql = "INSERT INTO STATISTICS (PROJECT_ID, PROJECT_NAME, PRINCIPAL_UNIT, PRINCIPAL_NAME, PROJECT_CATEGORY, PROJECT_TYPE, PROJECT_LEVEL, TOTAL_FUNDS, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS, PROJECT_STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            if(bpmStatus == null){}
+
+            String insertSql = "INSERT INTO STATISTICS (PROJECT_ID, PROJECT_NAME, PRINCIPAL_UNIT, PRINCIPAL_NAME, PROJECT_CATEGORY, PROJECT_TYPE, PROJECT_LEVEL, TOTAL_FUNDS, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS, PROJECT_STATUS, ACCEPTANCE_POINT, PROJECT_RESULT, PROJECT_FUNDS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             entityManager.createNativeQuery(insertSql)
                     .setParameter(1, projectID)
                     .setParameter(2, projectName)
@@ -374,6 +414,9 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
                     .setParameter(11, professional)
                     .setParameter(12, bpmStatus)
                     .setParameter(13, projectStatus)
+                    .setParameter(14, acceptancePoint)
+                    .setParameter(15, projectResult)
+                    .setParameter(16, projectFunds)
                     .executeUpdate();
         }
 
@@ -384,7 +427,6 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
         String querySql = "SELECT * FROM MA_PRJ_I_S_PROJECT_TD";
         List<Map<String, Object>> resultList = entityManager.createNativeQuery(querySql)
                 .getResultList();
-        System.out.println(resultList.toArray());
     }
 
 }
