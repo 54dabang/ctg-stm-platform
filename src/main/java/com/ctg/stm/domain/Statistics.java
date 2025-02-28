@@ -127,7 +127,7 @@ public class Statistics implements Serializable {
     @ApiModelProperty(value = "流程状态")
     @Column(name = "BPM_STATUS")
     //需要改成String
-    private Integer bpmStatus;
+    private String bpmStatus;
 
     @ApiModelProperty(value = "项目所属领域 对应业务板块（水电、新能源、火电）")
     @Column(name = "BUSINESS_SECTOR")

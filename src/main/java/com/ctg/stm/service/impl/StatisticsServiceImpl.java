@@ -11,7 +11,6 @@ import com.ctg.stm.service.PredicateCallBack;
 import com.ctg.stm.service.StatisticsService;
 import com.ctg.stm.util.ProjectEnum;
 import com.google.common.collect.Lists;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -77,8 +76,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         // 动态条件构建
         List<Predicate> predicates = buildPredicates(root, cb, queryDTO);
-        Predicate inPredicate = root.get("bpmStatus")
-                .in(ProjectEnum.ProBpmStatus.PROCESSING.value(), ProjectEnum.ProBpmStatus.PROCESSING_ACCEPTANCE.value());
+        Predicate inPredicate = root.get("projectStatus")
+                .in(ProjectEnum.ProjectStatus.PROCESSING.desc());
         predicates.add(inPredicate);
         cq.where(predicates.toArray(new Predicate[0]));
 
@@ -102,8 +101,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         // 动态条件构建
         List<Predicate> predicates = buildPredicates(root, cb, queryDTO);
-        Predicate inPredicate = root.get("bpmStatus")
-                .in(ProjectEnum.ProBpmStatus.ACCEPTANCE.value());
+        Predicate inPredicate = root.get("projectStatus")
+                .in(ProjectEnum.ProjectStatus.ACCEPTANCE.desc());
         predicates.add(inPredicate);
         cq.where(predicates.toArray(new Predicate[0]));
 
@@ -156,7 +155,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<ProjectPrincipalUnitBpmStatusVO> countProjectNumGroupByPrincipalUnitAndProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO) {
+    public List<ProjectPrincipalUnitProjectStatusVO> countProjectNumGroupByPrincipalUnitAndProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
         Root<Statistics> root = cq.from(Statistics.class);
@@ -164,7 +163,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         // 构建统计字段（分组字段 + 计数）
         cq.multiselect(
                 root.get("principalUnit"),    // 分组字段2
-                root.get("bpmStatus"),        // 分组字段1
+                root.get("projectStatus"),        // 分组字段1
                 cb.count(root.get("id"))      // 统计数量
         );
 
@@ -175,13 +174,13 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         // 分组配置（双字段分组）
         cq.groupBy(
-                root.get("bpmStatus"),
+                root.get("projectStatus"),
                 root.get("principalUnit")
         );
 
         // 添加排序（可选）
         cq.orderBy(
-                cb.asc(root.get("bpmStatus")),
+                cb.asc(root.get("projectStatus")),
                 cb.asc(root.get("principalUnit"))
         );
         // 执行查询并转换结果
@@ -220,16 +219,15 @@ public class StatisticsServiceImpl implements StatisticsService {
         return entityManager.createQuery(cq)
                 .getResultList()
                 .stream()
-                .map(r->new ProjectfundsGroupByPrincipalUnitVO((String) r[0], Optional.ofNullable(r[1]).map(BigDecimal.class::cast).orElse(BigDecimal.ZERO)))
+                .map(r -> new ProjectfundsGroupByPrincipalUnitVO((String) r[0], Optional.ofNullable(r[1]).map(BigDecimal.class::cast).orElse(BigDecimal.ZERO)))
                 .collect(Collectors.toList());
     }
 
     // 结果转换方法
-    private ProjectPrincipalUnitBpmStatusVO convertToVO(Object[] result) {
-        return new ProjectPrincipalUnitBpmStatusVO(
+    private ProjectPrincipalUnitProjectStatusVO convertToVO(Object[] result) {
+        return new ProjectPrincipalUnitProjectStatusVO(
                 (String) result[0],  //
-                (Integer) result[1],  // bpmStatus
-                (String) ProjectEnum.ProBpmStatus.getByValue((Integer) result[1]).desc(),
+                (String) result[1],
                 (Long) result[2]     // count
         );
     }
@@ -240,8 +238,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         PredicateCallBack predicateCallBack = (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
-            Predicate inPredicate = root.get("bpmStatus")
-                    .in(ProjectEnum.ProBpmStatus.PROCESSING.desc(), ProjectEnum.ProBpmStatus.PROCESSING_ACCEPTANCE.desc());
+            Predicate inPredicate = root.get("projectStatus")
+                    .in(ProjectEnum.ProjectStatus.PROCESSING.desc());
             predicateList.add(inPredicate);
             return predicateList;
         };
@@ -256,7 +254,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private void addIfNotEmpty(List<Predicate> predicates, Root<?> root,
                                CriteriaBuilder cb, String fieldName, Object value) {
-        if (Objects.nonNull(value)) {
+        if (Objects.nonNull(value) && !StringUtils.isEmpty(value)) {
             predicates.add(cb.equal(root.get(fieldName), value));
         }
     }
@@ -275,8 +273,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         // 动态条件构建
         List<Predicate> predicates = buildPredicates(root, cb, queryDTO);
-        Predicate inPredicate = root.get("bpmStatus")
-                .in(ProjectEnum.ProBpmStatus.PROCESSING.value(), ProjectEnum.ProBpmStatus.PROCESSING_ACCEPTANCE.value());
+        Predicate inPredicate = root.get("projectStatus")
+                .in(ProjectEnum.ProjectStatus.PROCESSING.desc());
         predicates.add(inPredicate);
         cq.where(predicates.toArray(new Predicate[0]));
 
@@ -319,14 +317,14 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public List<ProjectCountGroupByBpmStatusVO> countProjectNumGroupByProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO) {
+    public List<ProjectCountGroupByProjectStatusVO> countProjectNumGroupByProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
         Root<Statistics> root = cq.from(Statistics.class);
 
         // 构建统计字段
         cq.multiselect(
-                root.get("bpmStatus"),  // 分组字段
+                root.get("projectStatus"),  // 分组字段
                 cb.count(root.get("id"))     // 统计数量
         );
 
@@ -335,14 +333,14 @@ public class StatisticsServiceImpl implements StatisticsService {
         cq.where(predicates.toArray(new Predicate[0]));
 
         // 分组配置
-        cq.groupBy(root.get("bpmStatus"));
+        cq.groupBy(root.get("projectStatus"));
 
         // 执行数据库层面分组查询
         List<Object[]> results = entityManager.createQuery(cq).getResultList();
         // 结果转换
         return results.stream()
-                .map(arr -> new ProjectCountGroupByBpmStatusVO(
-                        (Integer) arr[0], (Long) arr[1]))
+                .map(arr -> new ProjectCountGroupByProjectStatusVO(
+                        (String) arr[0], (Long) arr[1]))
                 .collect(Collectors.toList());
     }
 
@@ -354,7 +352,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             PredicateCallBack predicateCallBack = new PredicateCallBack() {
                 @Override
                 public List<Predicate> toPredicates(Root rt, CriteriaQuery query, CriteriaBuilder cb) {
-                    return Arrays.asList(cb.equal(root.get("projectImportant"),Integer.valueOf(Constants.ALL_YES)));
+                    return Arrays.asList(cb.equal(root.get("projectImportant"), Integer.valueOf(Constants.ALL_YES)));
                 }
             };
             return buildSpecification(root, query, cb, queryDTO, predicateCallBack);
@@ -385,12 +383,12 @@ public class StatisticsServiceImpl implements StatisticsService {
         PredicateCallBack predicateCallBack = new PredicateCallBack() {
             @Override
             public List<Predicate> toPredicates(Root rt, CriteriaQuery query, CriteriaBuilder cb) {
-                return Arrays.asList(cb.equal(root.get("projectImportant"),Integer.valueOf(Constants.ALL_YES)));
+                return Arrays.asList(cb.equal(root.get("projectImportant"), Integer.valueOf(Constants.ALL_YES)));
             }
         };
         MonthlyScientificResearchReportQueryDTO queryDTO = new MonthlyScientificResearchReportQueryDTO();
 
-        Predicate predicate = buildSpecification(root,cq, cb, queryDTO,predicateCallBack);
+        Predicate predicate = buildSpecification(root, cq, cb, queryDTO, predicateCallBack);
         cq.where(predicate);
 
         // 分组配置
@@ -421,13 +419,13 @@ public class StatisticsServiceImpl implements StatisticsService {
         PredicateCallBack predicateCallBack = new PredicateCallBack() {
             @Override
             public List<Predicate> toPredicates(Root rt, CriteriaQuery query, CriteriaBuilder cb) {
-                return Arrays.asList(cb.equal(root.get("projectImportant"),Integer.valueOf(Constants.ALL_YES)));
+                return Arrays.asList(cb.equal(root.get("projectImportant"), Integer.valueOf(Constants.ALL_YES)));
             }
         };
 
         MonthlyScientificResearchReportQueryDTO queryDTO = new MonthlyScientificResearchReportQueryDTO();
 
-        Predicate predicate = buildSpecification(root,cq, cb, queryDTO,predicateCallBack);
+        Predicate predicate = buildSpecification(root, cq, cb, queryDTO, predicateCallBack);
         cq.where(predicate);
 
         // 分组配置
@@ -456,7 +454,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         // 字符串类型精确匹配
         addIfNotEmpty(predicates, root, cb, "principalUnit", queryDTO.getPrincipalUnit());
         addIfNotEmpty(predicates, root, cb, "businessSector", queryDTO.getBusinessSector());
-        addIfNotEmpty(predicates, root, cb, "researchAttribute", queryDTO.getResearchAttribute());
+        addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttribute());
 
         // 数值类型精确匹配
         if (queryDTO.getProjectLevel() != null) {
@@ -503,21 +501,26 @@ public class StatisticsServiceImpl implements StatisticsService {
         // 构造Pageable对象
         Pageable pageable = buildPage(searchDTO);
 
-        // 构造动态筛选条件（假设关键词匹配多个字段）
-        Specification<Statistics> spec = (root, query, criteriaBuilder) -> {
-            // 关键字匹配多个字段
-            return criteriaBuilder.or(
-                    criteriaBuilder.like(root.get("projectName"), "%" + searchDTO.getKeywords() + "%")
-            );
-        };
-        return this.findAll(pageable,spec);
+        Specification<Statistics> spec = null;
+        if (!StringUtils.isEmpty(searchDTO.getKeywords())) {
+            // 构造动态筛选条件（假设关键词匹配多个字段）
+            spec = (root, query, criteriaBuilder) -> {
+                // 关键字匹配多个字段
+                return criteriaBuilder.and(
+                        criteriaBuilder.like(root.get("projectName"), "%" + searchDTO.getKeywords() + "%")
+                );
+            };
+        }
+
+        return this.findAll(pageable, spec);
     }
 
 
-    private Pageable buildPage(StatisticsSearchDTO searchDTO){
+    private Pageable buildPage(StatisticsSearchDTO searchDTO) {
         Sort sort = Sort.by(searchDTO.getOrder().equalsIgnoreCase("asc") ? Sort.Order.asc(searchDTO.getSort()) : Sort.Order.desc(searchDTO.getSort()));
         return PageRequest.of(searchDTO.getCurrent(), searchDTO.getSize(), sort);
     }
+
     @Override
     public Page<Statistics> statisticspage(ProjectQueryDetailDTO projectQueryDetailDTO) {
         Pageable pageable = buildPage(projectQueryDetailDTO.getSearchDTO());
@@ -525,7 +528,8 @@ public class StatisticsServiceImpl implements StatisticsService {
             PredicateCallBack predicateCallBack = new PredicateCallBack() {
                 @Override
                 public List<Predicate> toPredicates(Root rt, CriteriaQuery query, CriteriaBuilder cb) {
-                    Predicate predicate =  cb.like(root.get("projectName"), "%" + projectQueryDetailDTO.getSearchDTO().getKeywords() + "%");
+                    String keyword = Optional.ofNullable(projectQueryDetailDTO.getSearchDTO().getKeywords()).orElse("");
+                    Predicate predicate = cb.like(root.get("projectName"), "%" + keyword + "%");
                     return Arrays.asList(predicate);
                 }
             };

@@ -82,8 +82,8 @@ public class ProjectStatisticsBasicUnitServiceImpl implements ProjectStatisticsB
         PredicateCallBack predicateCallBack = (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
 
-            Predicate inPredicate = root.get("bpmStatus")
-                    .in(ProjectEnum.ProBpmStatus.PROCESSING.desc(), ProjectEnum.ProBpmStatus.PROCESSING_ACCEPTANCE.desc());
+            Predicate inPredicate = root.get("projectStatus")
+                    .in(ProjectEnum.ProjectStatus.PROCESSING.desc());
             predicateList.add(inPredicate);
             return predicateList;
         };

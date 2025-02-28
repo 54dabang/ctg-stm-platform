@@ -24,7 +24,7 @@ public interface StatisticsService {
 
     List<Statistics> findAllStatistics();
 
-    List<ProjectCountGroupByBpmStatusVO> countProjectNumGroupByProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO);
+    List<ProjectCountGroupByProjectStatusVO> countProjectNumGroupByProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO);
 
     List<ProjectCountGroupByProjectCategoryVO> countProjectNumGroupByProjectCategoryUnderDevelopment(MonthlyScientificResearchReportQueryDTO queryDTO);
 
@@ -40,7 +40,7 @@ public interface StatisticsService {
     BigDecimal sumProjectTotalFunds(MonthlyScientificResearchReportQueryDTO queryDTO);
 
 
-    List<ProjectPrincipalUnitBpmStatusVO> countProjectNumGroupByPrincipalUnitAndProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO);
+    List<ProjectPrincipalUnitProjectStatusVO> countProjectNumGroupByPrincipalUnitAndProBpmStatus(MonthlyScientificResearchReportQueryDTO queryDTO);
 
     List<ProjectfundsGroupByPrincipalUnitVO> countProjectTotalFundsGroupByPrincipalUnit(MonthlyScientificResearchReportQueryDTO queryDTO);
 

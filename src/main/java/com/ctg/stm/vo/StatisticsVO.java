@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 @Getter
 @Setter
 public class StatisticsVO extends Statistics {
-    private String bpmStatusStr;
+
 
     public StatisticsVO(Statistics statistics) {
         // 将父类字段拷贝到子类
@@ -26,7 +26,7 @@ public class StatisticsVO extends Statistics {
         }
 
         // 设置 bpmStatusStr
-        this.bpmStatusStr = ProjectEnum.ProBpmStatus.getByValue(statistics.getBpmStatus()).desc();
+        //this.bpmStatusStr = ProjectEnum.ProBpmStatus.getByValue(statistics.getBpmStatus()).desc();
     }
 
 }

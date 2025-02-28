@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.ctg.stm.domain.Statistics;
 import com.ctg.stm.dto.MonthlyScientificResearchReportQueryDTO;
-import com.ctg.stm.util.BeanCopyUtil;
 import com.ctg.stm.vo.*;
 import com.ctg.stm.service.StatisticsService;
 import com.ctg.stm.util.ProjectEnum;
@@ -12,8 +11,6 @@ import com.ctg.stm.util.Result;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.hibernate.Hibernate;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +18,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -66,14 +62,14 @@ public class ScientificResearchReportController {
     @ApiOperation(value = "项目整体情况")
     @RequestMapping(value = "/api/projectOverallSituation", method = RequestMethod.POST)
     public Result projectOverallSituation(@RequestBody MonthlyScientificResearchReportQueryDTO queryDTO) {
-        List<ProjectCountGroupByBpmStatusVO> list = statisticsService.countProjectNumGroupByProBpmStatus(queryDTO);
-        Map<Integer, Long> statusCountMap = new HashMap<>();
+        List<ProjectCountGroupByProjectStatusVO> list = statisticsService.countProjectNumGroupByProBpmStatus(queryDTO);
+        Map<String, Long> statusCountMap = new HashMap<>();
         list.forEach(item -> {
-            statusCountMap.put(item.getProBpmStatus(), item.getCount());
+            statusCountMap.put(item.getProjectStatus(), item.getCount());
         });
-        Map<String, Long> finalResult = ProjectEnum.ProBpmStatus.getValueList().stream()
+        Map<String, Long> finalResult = ProjectEnum.ProjectStatus.getDescList().stream()
                 .collect(Collectors.toMap(
-                        status -> ProjectEnum.ProBpmStatus.getByValue(status).desc(),
+                        status -> status,
                         status -> statusCountMap.getOrDefault(status, 0L)
                 ));
         return Result.success(finalResult);
@@ -179,8 +175,8 @@ public class ScientificResearchReportController {
     @ApiOperation(value = "验收项目数(各单位处于各种状态的项目数量)")
     @RequestMapping(value = "/api/countProjectNumGroupByPrincipalUnitAndProBpmStatus", method = RequestMethod.POST)
     public Result countProjectNumGroupByPrincipalUnitAndProBpmStatus(@RequestBody MonthlyScientificResearchReportQueryDTO queryDTO) {
-        List<ProjectPrincipalUnitBpmStatusVO> projectPrincipalUnitBpmStatusVOList = statisticsService.countProjectNumGroupByPrincipalUnitAndProBpmStatus(queryDTO);
-        return Result.success(projectPrincipalUnitBpmStatusVOList);
+        List<ProjectPrincipalUnitProjectStatusVO> projectPrincipalUnitProjectStatusVOList = statisticsService.countProjectNumGroupByPrincipalUnitAndProBpmStatus(queryDTO);
+        return Result.success(projectPrincipalUnitProjectStatusVOList);
     }
 
 

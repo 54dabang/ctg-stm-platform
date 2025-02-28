@@ -34,14 +34,14 @@ public class ImportantProjectOverviewController {
     @RequestMapping(value = "/api/countImportantProjectSumFundsGroupByRank", method = RequestMethod.POST)
     public Result countImportantProjectSumFundsGroupByRank() {
 
-        List<ImportantProjectCountGroupByRankVO> importantProjectCountGroupByRankVOList = statisticsService.countImportantProjectNumGroupByRank();
+        List<ImportantProjectSumFundsGroupByRankVO> importantProjectCountGroupByRankVOList = statisticsService.countImportantProjectSumFundsGroupByRank();
         return Result.success(importantProjectCountGroupByRankVOList);
     }
     @ApiOperation(value = "按照项目级别统计（单位 个）")
     @RequestMapping(value = "/api/countImportantProjectNumGroupByRank", method = RequestMethod.POST)
     public Result countImportantProjectNumGroupByRank() {
 
-        List<ImportantProjectSumFundsGroupByRankVO> importantProjectSumFundsGroupByRankVOList = statisticsService.countImportantProjectSumFundsGroupByRank();
+        List<ImportantProjectCountGroupByRankVO> importantProjectSumFundsGroupByRankVOList = statisticsService.countImportantProjectNumGroupByRank();
 
         return Result.success(importantProjectSumFundsGroupByRankVOList);
     }

@@ -6,15 +6,14 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ProjectPrincipalUnitBpmStatusVO {
+public class ProjectPrincipalUnitProjectStatusVO {
     @ApiModelProperty("主管单位")
     private String projectPrincipalUnit;
 
     @ApiModelProperty("流程状态")
-    private Integer proBpmStatus;
+    private String projectStatus;
 
-    @ApiModelProperty("流程状态描述")
-    private String proBpmStatusDesc;
+
 
     @ApiModelProperty("统计结果")
     private Long count;
