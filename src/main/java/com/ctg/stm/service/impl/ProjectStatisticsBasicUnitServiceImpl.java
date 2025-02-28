@@ -103,7 +103,7 @@ public class ProjectStatisticsBasicUnitServiceImpl implements ProjectStatisticsB
         List<Predicate> predicates = Lists.newArrayList();
         addIfNotEmpty(predicates, root, cb, "principalUnit", queryDTO.getPrincipalUnit());
         addIfNotEmpty(predicates, root, cb, "businessSector", queryDTO.getBusinessSector());
-        addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttribute());
+        addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttributes());
 
         return predicates;
     }

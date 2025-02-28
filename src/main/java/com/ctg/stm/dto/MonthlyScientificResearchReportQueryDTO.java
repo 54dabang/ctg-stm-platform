@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 
@@ -26,7 +25,7 @@ public class MonthlyScientificResearchReportQueryDTO {
     private String businessSector;
 
     @ApiModelProperty(value = "研发属性 基础研究 应用基础研究")
-    private String researchAttribute;
+    private String researchAttributes;
 
 
     @ApiModelProperty(value = "项目层级 项目类别 国家级")

@@ -454,7 +454,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         // 字符串类型精确匹配
         addIfNotEmpty(predicates, root, cb, "principalUnit", queryDTO.getPrincipalUnit());
         addIfNotEmpty(predicates, root, cb, "businessSector", queryDTO.getBusinessSector());
-        addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttribute());
+        addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttributes());
 
         // 数值类型精确匹配
         if (queryDTO.getProjectLevel() != null) {
@@ -475,7 +475,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<Predicate> predicates = Lists.newArrayList();
         addIfNotEmpty(predicates, root, cb, "principalUnit", queryDTO.getPrincipalUnit());
         addIfNotEmpty(predicates, root, cb, "businessSector", queryDTO.getBusinessSector());
-        addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttribute());
+        addIfNotEmpty(predicates, root, cb, "researchAttributes", queryDTO.getResearchAttributes());
 
         return predicates;
     }
