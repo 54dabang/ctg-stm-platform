@@ -19,6 +19,7 @@ public class TestController {
     @RequestMapping(value = "/copy", method = RequestMethod.GET)
     public void copy(){
         statisticsSchedulerService.syncProjectData();
+        statisticsSchedulerService.syncRewardData();
     }
 
 }

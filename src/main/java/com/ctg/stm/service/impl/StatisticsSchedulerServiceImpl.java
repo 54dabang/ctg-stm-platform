@@ -395,11 +395,61 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
             }else{
                 projectResult = 0;
             }
+            //项目成果ID集合
+            Integer resultZL=0;
+            Integer resultRZ=0;
+            Integer resultBZ=0;
+            Integer resultLW=0;
+            Integer resultZZ=0;
+            Integer rewardGJ=0;
+            Integer rewardSB=0;
+            Integer rewardHY=0;
+            Integer rewardQT=0;
+            Integer projectReward=0;
+            String projectResultIDs = "SELECT STMS.MA_PRJ_E_S_PROJECT_CGJL_TD.KJJL_ID FROM STMS.MA_PRJ_E_S_PROJECT_CGJL_TD WHERE PROJECT_ID = ?1";
+            Query projectResultIDsQuery = entityManager.createNativeQuery(projectResultIDs);
+            List<String> kjjlID = projectResultIDsQuery.setParameter(1, projectID).getResultList();
+            if (!kjjlID.isEmpty()) {
+                for (String summaryID : kjjlID) {
+                    String resultType = "SELECT RESULT_TYPE FROM STMS.RESULT_SUMMARY WHERE ID = ?1";
+                    Query resultTypeQuery = entityManager.createNativeQuery(resultType);
+                    List<String> type = resultTypeQuery.setParameter(1, summaryID).getResultList();
+                    if(!type.isEmpty()){
+                        resultType = type.get(0);
+                        if(resultType.equals("01")){
+                            resultZL = resultZL+1;
+                        }else if(resultType.equals("02")){
+                            resultRZ = resultRZ+1;
+                        }else if(resultType.equals("03")){
+                            resultBZ = resultBZ+1;
+                        }else if(resultType.equals("04")){
+                            resultLW = resultLW+1;
+                        }else if(resultType.equals("05")){
+                            resultZZ = resultZZ+1;
+                        }
+                    }
+                }
+               projectResultIDsQuery.getResultList();
+            }
 
 
-            if(bpmStatus == null){}
 
-            String insertSql = "INSERT INTO STATISTICS (PROJECT_ID, PROJECT_NAME, PRINCIPAL_UNIT, PRINCIPAL_NAME, PROJECT_CATEGORY, PROJECT_TYPE, PROJECT_LEVEL, TOTAL_FUNDS, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS, PROJECT_STATUS, ACCEPTANCE_POINT, PROJECT_RESULT, PROJECT_FUNDS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+
+//            //重点项目
+//            String projectImportant = "SELECT PROJECT_NAME, APPLY_UNIT, PROJECT_CATEGORY FROM MA_PRJ_I_S_PROJECT_TD";
+//            Object[] projectImportantResult = entityManager.createNativeQuery(sql).getResultList().toArray();
+//            for (Object rowImportant : result) {
+//                Object[] columnsImportant = (Object[]) row;
+//                String projectImportantName = (String) columns[1];//项目名称
+//                String projectImportantUnit = (String) columns[1];//项目单位
+//                String projectImportantCate = (String) columns[1];//项目级别
+
+
+
+
+
+            String insertSql = "INSERT INTO STATISTICS (PROJECT_ID, PROJECT_NAME, PRINCIPAL_UNIT, PRINCIPAL_NAME, PROJECT_CATEGORY, PROJECT_TYPE, PROJECT_LEVEL, TOTAL_FUNDS, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS, PROJECT_STATUS, ACCEPTANCE_POINT, PROJECT_RESULT, PROJECT_FUNDS, RESULT_ZL, RESULT_LW, RESULT_BZ, RESULT_ZZ, RESULT_RZ, REWARD_GJ, REWARD_SB, REWARD_HY, REWARD_QT, PROJECT_REWARD) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             entityManager.createNativeQuery(insertSql)
                     .setParameter(1, projectID)
                     .setParameter(2, projectName)
@@ -417,16 +467,50 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
                     .setParameter(14, acceptancePoint)
                     .setParameter(15, projectResult)
                     .setParameter(16, projectFunds)
+                    .setParameter(17, resultZL)
+                    .setParameter(18, resultLW)
+                    .setParameter(19, resultBZ)
+                    .setParameter(20, resultZZ)
+                    .setParameter(21, resultRZ)
+                    .setParameter(22, rewardGJ)
+                    .setParameter(23, rewardSB)
+                    .setParameter(24, rewardHY)
+                    .setParameter(25, rewardQT)
+                    .setParameter(26, projectReward)
                     .executeUpdate();
         }
 
     }
 
+    @Transactional
     @Override
-    public void statisticsScheduler() {
-        String querySql = "SELECT * FROM MA_PRJ_I_S_PROJECT_TD";
-        List<Map<String, Object>> resultList = entityManager.createNativeQuery(querySql)
-                .getResultList();
+    public void syncRewardData() {
+        String deleteSql = "DELETE FROM STATISTICS_REWARDS";
+        entityManager.createNativeQuery(deleteSql).executeUpdate();
+        String sql = "SELECT ID, QR_REWARDS_CLASS FROM MA_WBCGJL_DECLARATION_TD";
+        Object[] result = entityManager.createNativeQuery(sql).getResultList().toArray();
+        for (Object row : result) {
+            Object[] columns = (Object[]) row;
+            String rewardID = (String) columns[0];//奖励ID
+            String rewardClass = (String) columns[1];//奖励级别
+            if(rewardID != null && rewardClass != null){
+                if(rewardClass.equals("0")){
+                    rewardClass = "国家级";
+                }else if(rewardClass.equals("1")){
+                    rewardClass = "省部级";
+                }else if(rewardClass.equals("2")){
+                    rewardClass = "行业学会级";
+                }else{
+                    rewardClass = "其它";
+                }
+            }else{
+                rewardClass = "其它";
+            }
+            String insertSql = "INSERT INTO STATISTICS_REWARDS (REWARD_ID, REWARD_CLASS) VALUES (?, ?)";
+            entityManager.createNativeQuery(insertSql)
+                    .setParameter(1, rewardID)
+                    .setParameter(2, rewardClass)
+                    .executeUpdate();
+        }
     }
-
 }

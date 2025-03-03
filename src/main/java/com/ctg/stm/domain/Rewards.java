@@ -20,7 +20,7 @@ public class Rewards {
     private Long id;
 
     @ApiModelProperty(value = "奖励级别")
-    @Column(name = "REWARDS_CLASS")
+    @Column(name = "REWARD_CLASS")
     private String rewardsClass;
 
 }
