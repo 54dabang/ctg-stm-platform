@@ -75,6 +75,28 @@ public class Statistics implements Serializable {
     @Column(name = "PROJECT_RESULT")
     private Integer projectResult;
 
+    @ApiModelProperty(value = "项目成果数量（专利）")
+    @Column(name = "RESULT_ZL")
+    private Integer resultZL;
+
+    @ApiModelProperty(value = "项目成果数量（软著）")
+    @Column(name = "RESULT_RZ")
+    private Integer resultRZ;
+
+    @ApiModelProperty(value = "项目成果数量（论文）")
+    @Column(name = "RESULT_LW")
+    private Integer resultLW;
+
+    @ApiModelProperty(value = "项目成果数量（标准）")
+    @Column(name = "RESULT_BZ")
+    private Integer resultBZ;
+
+    @ApiModelProperty(value = "项目成果数量（专著）")
+    @Column(name = "RESULT_ZZ")
+    private Integer resultZZ;
+
+
+
 //    @ApiModelProperty(value = "项目成果（近1月）")
 //    @Column(name = "PROJECT_RESULT_1")
 //    private int projectResult1;

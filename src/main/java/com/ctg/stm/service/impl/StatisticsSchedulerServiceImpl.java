@@ -401,11 +401,6 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
             Integer resultBZ=0;
             Integer resultLW=0;
             Integer resultZZ=0;
-            Integer rewardGJ=0;
-            Integer rewardSB=0;
-            Integer rewardHY=0;
-            Integer rewardQT=0;
-            Integer projectReward=0;
             String projectResultIDs = "SELECT STMS.MA_PRJ_E_S_PROJECT_CGJL_TD.KJJL_ID FROM STMS.MA_PRJ_E_S_PROJECT_CGJL_TD WHERE PROJECT_ID = ?1";
             Query projectResultIDsQuery = entityManager.createNativeQuery(projectResultIDs);
             List<String> kjjlID = projectResultIDsQuery.setParameter(1, projectID).getResultList();
@@ -437,19 +432,19 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
 
 
 //            //重点项目
-//            String projectImportant = "SELECT PROJECT_NAME, APPLY_UNIT, PROJECT_CATEGORY FROM MA_PRJ_I_S_PROJECT_TD";
+//            String projectImportant = "SELECT PROJECT_NAME, ZRDW, PROJECT_CATEGORY FROM MA_PRJ_I_S_PROJECT_TD";
 //            Object[] projectImportantResult = entityManager.createNativeQuery(sql).getResultList().toArray();
 //            for (Object rowImportant : result) {
 //                Object[] columnsImportant = (Object[]) row;
 //                String projectImportantName = (String) columns[1];//项目名称
-//                String projectImportantUnit = (String) columns[1];//项目单位
-//                String projectImportantCate = (String) columns[1];//项目级别
+//                String projectImportantUnit = (String) columns[2];//项目单位
+//                String projectImportantCate = (String) columns[3];//项目级别
 
 
 
 
 
-            String insertSql = "INSERT INTO STATISTICS (PROJECT_ID, PROJECT_NAME, PRINCIPAL_UNIT, PRINCIPAL_NAME, PROJECT_CATEGORY, PROJECT_TYPE, PROJECT_LEVEL, TOTAL_FUNDS, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS, PROJECT_STATUS, ACCEPTANCE_POINT, PROJECT_RESULT, PROJECT_FUNDS, RESULT_ZL, RESULT_LW, RESULT_BZ, RESULT_ZZ, RESULT_RZ, REWARD_GJ, REWARD_SB, REWARD_HY, REWARD_QT, PROJECT_REWARD) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String insertSql = "INSERT INTO STATISTICS (PROJECT_ID, PROJECT_NAME, PRINCIPAL_UNIT, PRINCIPAL_NAME, PROJECT_CATEGORY, PROJECT_TYPE, PROJECT_LEVEL, TOTAL_FUNDS, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS, PROJECT_STATUS, ACCEPTANCE_POINT, PROJECT_RESULT, PROJECT_FUNDS, RESULT_ZL, RESULT_LW, RESULT_BZ, RESULT_ZZ, RESULT_RZ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             entityManager.createNativeQuery(insertSql)
                     .setParameter(1, projectID)
                     .setParameter(2, projectName)
@@ -472,11 +467,6 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
                     .setParameter(19, resultBZ)
                     .setParameter(20, resultZZ)
                     .setParameter(21, resultRZ)
-                    .setParameter(22, rewardGJ)
-                    .setParameter(23, rewardSB)
-                    .setParameter(24, rewardHY)
-                    .setParameter(25, rewardQT)
-                    .setParameter(26, projectReward)
                     .executeUpdate();
         }
 
