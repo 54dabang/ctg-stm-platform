@@ -29,7 +29,7 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
         entityManager.createNativeQuery(deleteSql).executeUpdate();
 
         // 内部科研项目，从MA_PRJ_I_S_PROJECT_TD中查询项目数据
-        String sql = "SELECT ID, PROJECT_NAME, PRINCIPAL_UNIT, PROJECT_PRINCIPAL, PROJECT_CATEGORY, PROJECT_TYPE, TOTAL_FUNDS, PROJECT_LEVEL, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS FROM MA_PRJ_I_S_PROJECT_TD WHERE DEL = 0";
+        String sql = "SELECT ID, PROJECT_NAME, PRINCIPAL_UNIT, PROJECT_PRINCIPAL, PROJECT_CATEGORY, PROJECT_TYPE, TOTAL_FUNDS, PROJECT_LEVEL, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS, PROJECT_CODE, LX_CODE FROM MA_PRJ_I_S_PROJECT_TD WHERE DEL = 0";
         Object[] result = entityManager.createNativeQuery(sql).getResultList().toArray();
         for (Object row : result) {
             Object[] columns = (Object[]) row;
@@ -338,8 +338,6 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
                 }
             }
 
-
-
             String bpmStatus = (String) columns[11];//流程状态
             String projectStatus; //项目状态
             String acceptancePoint = ""; //所处验收节点
@@ -370,13 +368,13 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
                         }
                     }else{
                         projectStatus = "实施阶段";
-                        Random random = new Random();
-                        // 生成 a 到 b 之间的随机整数
-
-                        assert totalFunds != null;
-                        if(totalFunds.compareTo(BigDecimal.ZERO)>0) {
-                            projectFunds = totalFunds.multiply(BigDecimal.valueOf(Math.random()));
-                        }
+//                        Random random = new Random();
+//                        // 随机生成投入（测试用）
+//
+//                        assert totalFunds != null;
+//                        if(totalFunds.compareTo(BigDecimal.ZERO)>0) {
+//                            projectFunds = totalFunds.multiply(BigDecimal.valueOf(Math.random()));
+//                        }
 
                     }
                 } catch (NumberFormatException e) {
@@ -384,6 +382,35 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
                     projectStatus = "暂无法确定";
                 }
             }
+
+
+            String projectCode = (String) columns[12];//项目编号
+            String lxCode = (String) columns[13];//立项编号
+            String contractFuns = "SELECT ACT_PAY_AMOUNT FROM STMS.STATISTICS_CONTRACT_PAYMENT WHERE CN_TECH_PROJECT_NO = ?1";
+            String baoxiaoFuns = "SELECT VAT_AMOUNT FROM STMS.STATISTICS_REIMBURSEMENT_AMOUNT WHERE ZYX29 = ?1";
+            Query contractFunsQuery = entityManager.createNativeQuery(contractFuns);
+            List<BigDecimal> contractFundsResult = contractFunsQuery.setParameter(1, projectCode).getResultList();
+
+            Query baoxiaoFunsQuery = entityManager.createNativeQuery(baoxiaoFuns);
+            List<BigDecimal> baoxiaoFunsResult = baoxiaoFunsQuery.setParameter(1, lxCode).getResultList();
+
+            BigDecimal contractSum = BigDecimal.ZERO;
+            BigDecimal baoxiaoSum = BigDecimal.ZERO;
+
+            if(!contractFundsResult.isEmpty()){
+                for (BigDecimal num : contractFundsResult) {
+                    contractSum = contractSum.add(num);
+                }
+            }
+
+            if(!baoxiaoFunsResult.isEmpty()){
+                for (BigDecimal num : baoxiaoFunsResult) {
+                    baoxiaoSum = baoxiaoSum.add(num);
+                }
+            }
+
+            projectFunds = contractSum.add(baoxiaoSum);
+            System.out.println(projectFunds);
 
             //项目成果数
             int projectResult = 0;
