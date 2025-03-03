@@ -163,6 +163,10 @@ public class Statistics implements Serializable {
     @Column(name = "PROJECT_RANK")
     private String projectRank;
 
+    @ApiModelProperty(value = "重点项目里程碑")
+    @Column(name = "PROJECT_MILESTONE")
+    private String mileStone;
+
 
 
 

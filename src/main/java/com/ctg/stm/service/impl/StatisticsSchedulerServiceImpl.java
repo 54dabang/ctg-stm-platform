@@ -28,8 +28,8 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
         String deleteSql = "DELETE FROM STATISTICS";
         entityManager.createNativeQuery(deleteSql).executeUpdate();
 
-        // 从MA_PRJ_I_S_PROJECT_TD中查询项目数据
-        String sql = "SELECT ID, PROJECT_NAME, PRINCIPAL_UNIT, PROJECT_PRINCIPAL, PROJECT_CATEGORY, PROJECT_TYPE, TOTAL_FUNDS, PROJECT_LEVEL, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS FROM MA_PRJ_I_S_PROJECT_TD";
+        // 内部科研项目，从MA_PRJ_I_S_PROJECT_TD中查询项目数据
+        String sql = "SELECT ID, PROJECT_NAME, PRINCIPAL_UNIT, PROJECT_PRINCIPAL, PROJECT_CATEGORY, PROJECT_TYPE, TOTAL_FUNDS, PROJECT_LEVEL, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS FROM MA_PRJ_I_S_PROJECT_TD WHERE DEL = 0";
         Object[] result = entityManager.createNativeQuery(sql).getResultList().toArray();
         for (Object row : result) {
             Object[] columns = (Object[]) row;
@@ -53,7 +53,7 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
             }else{
                 switch (projectCategory) {
                     case "A":
-                        projectCategory = "A类国家/省部级";
+                        projectCategory = "A类国家级";
                         break;
                     case "B":
                         projectCategory = "B类集团级";
@@ -387,7 +387,7 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
 
             //项目成果数
             int projectResult = 0;
-            String countProjectResult = "SELECT COUNT(*) as PROJECT_RESULT FROM STMS.MA_PRJ_E_S_PROJECT_CGJL_TD WHERE PROJECT_ID = ?1  GROUP BY PROJECT_ID HAVING COUNT(*) > 1";
+            String countProjectResult = "SELECT COUNT(*) as PROJECT_RESULT FROM STMS.MA_PRJ_E_S_PROJECT_CGJL_TD WHERE PROJECT_ID = ?1 AND DEL = 0 GROUP BY PROJECT_ID HAVING COUNT(*) > 1";
             Query queryResult = entityManager.createNativeQuery(countProjectResult);
             queryResult.setParameter(1, projectID);
             if (!queryResult.getResultList().isEmpty()) {
@@ -401,12 +401,12 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
             Integer resultBZ=0;
             Integer resultLW=0;
             Integer resultZZ=0;
-            String projectResultIDs = "SELECT STMS.MA_PRJ_E_S_PROJECT_CGJL_TD.KJJL_ID FROM STMS.MA_PRJ_E_S_PROJECT_CGJL_TD WHERE PROJECT_ID = ?1";
+            String projectResultIDs = "SELECT STMS.MA_PRJ_E_S_PROJECT_CGJL_TD.KJJL_ID FROM STMS.MA_PRJ_E_S_PROJECT_CGJL_TD WHERE PROJECT_ID = ?1 AND DEL = 0";
             Query projectResultIDsQuery = entityManager.createNativeQuery(projectResultIDs);
             List<String> kjjlID = projectResultIDsQuery.setParameter(1, projectID).getResultList();
             if (!kjjlID.isEmpty()) {
                 for (String summaryID : kjjlID) {
-                    String resultType = "SELECT RESULT_TYPE FROM STMS.RESULT_SUMMARY WHERE ID = ?1";
+                    String resultType = "SELECT RESULT_TYPE FROM STMS.RESULT_SUMMARY WHERE ID = ?1 AND DEL = 0";
                     Query resultTypeQuery = entityManager.createNativeQuery(resultType);
                     List<String> type = resultTypeQuery.setParameter(1, summaryID).getResultList();
                     if(!type.isEmpty()){
@@ -426,23 +426,6 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
                 }
                projectResultIDsQuery.getResultList();
             }
-
-
-
-
-
-//            //重点项目
-//            String projectImportant = "SELECT PROJECT_NAME, ZRDW, PROJECT_CATEGORY FROM MA_PRJ_I_S_PROJECT_TD";
-//            Object[] projectImportantResult = entityManager.createNativeQuery(sql).getResultList().toArray();
-//            for (Object rowImportant : result) {
-//                Object[] columnsImportant = (Object[]) row;
-//                String projectImportantName = (String) columns[1];//项目名称
-//                String projectImportantUnit = (String) columns[2];//项目单位
-//                String projectImportantCate = (String) columns[3];//项目级别
-
-
-
-
 
             String insertSql = "INSERT INTO STATISTICS (PROJECT_ID, PROJECT_NAME, PRINCIPAL_UNIT, PRINCIPAL_NAME, PROJECT_CATEGORY, PROJECT_TYPE, PROJECT_LEVEL, TOTAL_FUNDS, RESEARCH_ATTRIBUTES, BUSINESS_SECTOR, PROFESSIONAL, BPM_STATUS, PROJECT_STATUS, ACCEPTANCE_POINT, PROJECT_RESULT, PROJECT_FUNDS, RESULT_ZL, RESULT_LW, RESULT_BZ, RESULT_ZZ, RESULT_RZ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             entityManager.createNativeQuery(insertSql)
@@ -467,6 +450,47 @@ public class StatisticsSchedulerServiceImpl implements StatisticsSchedulerServic
                     .setParameter(19, resultBZ)
                     .setParameter(20, resultZZ)
                     .setParameter(21, resultRZ)
+                    .executeUpdate();
+        }
+
+        //重点项目
+        String projectImportant = "SELECT PROJECT_NAME, PROJECT_PRINCIPAL, PRINCIPAL_UNIT, START_TIME, END_TIME, GOAL_MILESTONE, PROJECT_CATEGORY, AMOUNT_PAYED_YEAR FROM STATISTICS_WBXM";
+        Object[] projectImportantResult = entityManager.createNativeQuery(projectImportant).getResultList().toArray();
+        for (Object row : projectImportantResult) {
+            Object[] columns = (Object[]) row;
+            String projectName = (String) columns[0];//项目名称
+            String projectPrincipal = (String) columns[1];//项目填报人
+            String principalUnit = (String) columns[2];//项目单位
+            String startTime = columns[3].toString();
+            String endTime = columns[4].toString();
+            String milestone = columns[5].toString();//项目里程碑
+            String projectCate = (String) columns[6];//项目类型
+            BigDecimal amountPayed =  new BigDecimal(columns[7].toString());//年度完成金额
+
+            String projectRank;
+            if (projectCate.contains("部")) {
+                projectCate = "省部级";
+                projectRank = "省部级项目";
+            } else if(projectCate.contains("怀柔")) {
+                projectRank = "怀柔实验室";
+                projectCate = "国家级";
+            } else{
+                projectRank = "国家级项目";
+                projectCate = "国家级";
+            }
+
+            String insertSql2 = "INSERT INTO STATISTICS (PROJECT_NAME, PRINCIPAL_UNIT, PROJECT_CATEGORY, PROJECT_IMPORTANT, PROJECT_RANK, START_TIME, END_TIME, PRINCIPAL_NAME, PROJECT_MILESTONE, PROJECT_FUNDS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            entityManager.createNativeQuery(insertSql2)
+                    .setParameter(1, projectName)
+                    .setParameter(2, principalUnit)
+                    .setParameter(3, projectCate)
+                    .setParameter(4, 1)
+                    .setParameter(5, projectRank)
+                    .setParameter(6, startTime)
+                    .setParameter(7, endTime)
+                    .setParameter(8, projectPrincipal)
+                    .setParameter(9, milestone)
+                    .setParameter(10, amountPayed)
                     .executeUpdate();
         }
 
